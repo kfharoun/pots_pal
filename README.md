@@ -1,4 +1,3 @@
-
 # Pots Pal
 
 ![prototype](https://i.imgur.com/9S5vwqi.png)
@@ -20,3 +19,5 @@
 ## Component Hierarchy 
 
 ![component hierarchy](https://i.imgur.com/l6sMfjH.png)
+
+[trello](https://trello.com/b/b7WofYMN/pots-pal)
