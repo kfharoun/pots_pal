@@ -1,5 +1,7 @@
 # Pots Pal
 
+### **[trello](https://trello.com/b/b7WofYMN/pots-pal)**
+
 ![prototype](https://i.imgur.com/9S5vwqi.png)
 
 * when user logs in, they are able to input information immediately. if they want to log more detailed info, they go in to daily log. 
@@ -20,4 +22,3 @@
 
 ![component hierarchy](https://i.imgur.com/l6sMfjH.png)
 
-[trello](https://trello.com/b/b7WofYMN/pots-pal)
