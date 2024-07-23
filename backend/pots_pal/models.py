@@ -32,7 +32,18 @@ class CustomUser(AbstractBaseUser):
         db_table = 'customuser'
 
     def __str__(self):
-        return self.email
+        return self.username
+
+class Favorite(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='favorite')
+    food_items = ArrayField(models.CharField(max_length=100), blank=True, default=list)
+    activity_items = ArrayField(models.CharField(max_length=100), blank=True, default=list)
+
+    class Meta:
+        db_table = 'favorite'
+    
+    def __str__(self):
+        return f"{self.user}'s favorites"
 
 class Day(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='days')
@@ -51,24 +62,15 @@ class Day(models.Model):
 
 class Data(models.Model):
     day = models.ForeignKey(Day, on_delete=models.CASCADE, related_name='data')
-    meal_item = ArrayField(
-        ArrayField(
-            models.CharField(max_length=100, blank=True),
-            size=10,
-        ),
-    )
+    meal_item = ArrayField(ArrayField(models.CharField(max_length=100, blank=True)), size=10)
     favorite_meal = models.BooleanField(default=False)
-    favorite_meal_item = ArrayField(
-        models.CharField(max_length=100, blank=True),
-        null=True,
-        blank=True
-    )
     water_intake = models.IntegerField(default=0)
     salt_intake = models.IntegerField(default=0)
     weather = models.IntegerField(default=0)
     low_heart_rate = models.IntegerField(default=0)
     high_heart_rate = models.IntegerField(default=0)
-    activity = models.BooleanField(default=False)
+    activity_item = ArrayField(ArrayField(models.CharField(max_length=100, blank=True)), size=10)
+    favorite_activity = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'data'

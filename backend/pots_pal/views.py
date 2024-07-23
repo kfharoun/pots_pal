@@ -1,47 +1,45 @@
 from rest_framework import generics
-from rest_framework.permissions import IsAuthenticated
-from .models import CustomUser, Day, Data
-from .serializers import UserSerializer, DaySerializer, DataSerializer
+from rest_framework.permissions import AllowAny
+from .models import CustomUser, Day, Data, Favorite
+from .serializers import UserSerializer, DaySerializer, DataSerializer, FavoriteSerializer
 
-class UserList(generics.ListAPIView):
+class UserList(generics.ListCreateAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
-class UserDetail(generics.RetrieveAPIView):
+class UserDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated]
-  
+    permission_classes = [AllowAny]
 
 class ListDay(generics.ListCreateAPIView):
     queryset = Day.objects.all()
     serializer_class = DaySerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
+
 
 class DayDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Day.objects.all()
     serializer_class = DaySerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
+
+class FavoriteList(generics.ListCreateAPIView):
+    queryset = Favorite.objects.all()
+    serializer_class = FavoriteSerializer
+    permission_classes = [AllowAny]
+
+class FavoriteDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Favorite.objects.all()
+    serializer_class = FavoriteSerializer
+    permission_classes = [AllowAny]
 
 class ListData(generics.ListCreateAPIView):
     queryset = Data.objects.all()
     serializer_class = DataSerializer
-    permission_classes = [IsAuthenticated]
-
-    def perform_create(self, serializer):
-        favorite_meal_items = serializer.validated_data.get('favorite_meal_item', [])
-        if serializer.validated_data.get('favorite_meal') and not favorite_meal_items:
-            raise serializers.ValidationError("Favorite meal items must be provided if a meal is marked as favorite.")
-        serializer.save()
+    permission_classes = [AllowAny]
 
 class DataDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Data.objects.all()
     serializer_class = DataSerializer
-    permission_classes = [IsAuthenticated]
-
-    def perform_update(self, serializer):
-        favorite_meal_items = serializer.validated_data.get('favorite_meal_item', [])
-        if serializer.validated_data.get('favorite_meal') and not favorite_meal_items:
-            raise serializers.ValidationError("Favorite meal items must be provided if a meal is marked as favorite.")
-        serializer.save()
+    permission_classes = [AllowAny]
