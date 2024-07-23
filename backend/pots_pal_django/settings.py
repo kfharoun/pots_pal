@@ -33,7 +33,40 @@ ALLOWED_HOSTS = []
 import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# settings.py
 
+AUTH0_DOMAIN = 'dev-8zo7hrodz5c4xnle.us.auth0.com'
+AUTH0_CLIENT_ID = '2EfvtIDfFFCaQgKewi7sTc4cz7NQLTup'
+AUTH0_CLIENT_SECRET = 'V0-EX2igUk-cOU0Wu9PwyhngXVWBloZXG2K5NGQ34-Yljy9LkMhJix45BF9FGoRn'
+AUTH0_AUDIENCE = 'https://potspal.api.com'
+
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5555",
+]
+
+CORS_ALLOW_ALL_ORIGINS = True
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173"
+]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'your_app.authentication.JWTAuthentication',  # Add your custom authentication class if needed
+    ),
+}
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -59,7 +92,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'pots_pal', 
     'rest_framework',
-    'rest_framework_simplejwt'
+    'rest_framework_simplejwt', 
+    'corsheaders'
 ]
 
 MIDDLEWARE = [

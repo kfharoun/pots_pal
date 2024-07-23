@@ -1,26 +1,41 @@
 from django.db import models
-from django.core.validators import RegexValidator
 from django.contrib.postgres.fields import ArrayField
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
-class User(models.Model):
+class CustomUserManager(BaseUserManager):
+    def create_user(self, email, username, auth0_id=None, password=None, **extra_fields):
+        if not email:
+            raise ValueError('The Email field must be set')
+        email = self.normalize_email(email)
+        user = self.model(email=email, username=username, auth0_id=auth0_id, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, username, password=None, **extra_fields):
+        extra_fields.setdefault('is_admin', True)
+        return self.create_user(email, username, auth0_id=None, password=password, **extra_fields)
+
+class CustomUser(AbstractBaseUser):
     email = models.EmailField(unique=True)
-    username = models.CharField(max_length=10)
-    zip_code = models.CharField(
-        max_length=10,
-        validators=[
-            RegexValidator(
-                regex=r'^\d{5}(?:-\d{4})?$',
-                message='Enter a valid zip code in the format XXXXX or XXXXX-XXXX.'
-            )
-        ]
-    )
-    password = models.CharField(max_length=255) 
+    username = models.CharField(max_length=150, unique=True)
+    auth0_id = models.CharField(max_length=64, unique=True, null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+    is_admin = models.BooleanField(default=False)
+
+    objects = CustomUserManager()
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']
+
+    class Meta:
+        db_table = 'customuser'
 
     def __str__(self):
-        return self.username
+        return self.email
 
 class Day(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='days')
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='days')
     date = models.DateField(null=True, blank=True)
     good_day = models.BooleanField(default=False)
     neutral_day = models.BooleanField(default=False)
@@ -36,11 +51,21 @@ class Day(models.Model):
 
 class Data(models.Model):
     day = models.ForeignKey(Day, on_delete=models.CASCADE, related_name='data')
-    meal_item = ArrayField(models.CharField(max_length=200), blank=True, default=list)
+    meal_item = ArrayField(
+        ArrayField(
+            models.CharField(max_length=100, blank=True),
+            size=10,
+        ),
+    )
     favorite_meal = models.BooleanField(default=False)
+    favorite_meal_item = ArrayField(
+        models.CharField(max_length=100, blank=True),
+        null=True,
+        blank=True
+    )
     water_intake = models.IntegerField(default=0)
     salt_intake = models.IntegerField(default=0)
-    weather = models.CharField(max_length=200)
+    weather = models.IntegerField(default=0)
     low_heart_rate = models.IntegerField(default=0)
     high_heart_rate = models.IntegerField(default=0)
     activity = models.BooleanField(default=False)
