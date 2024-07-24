@@ -1,14 +1,21 @@
-import { Link } from 'react-router-dom';
-import { Navbar, Nav } from 'react-bootstrap';
-import { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom'
+import { Navbar, Nav } from 'react-bootstrap'
+import { useEffect, useState } from 'react'
 
 export default function Header() {
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false)
+  const navigate = useNavigate()
 
   useEffect(() => {
-    const user = localStorage.getItem('loggedInUser');
-    setLoggedIn(!!user); // Set loggedIn to true if user exists
-  }, []);
+    const user = localStorage.getItem('loggedInUser')
+    setLoggedIn(!!user)
+  }, [])
+
+  const handleLogout = () => {
+    localStorage.removeItem('loggedInUser')
+    setLoggedIn(false)
+    navigate('/login')
+  };
 
   return (
     <Navbar bg="light" expand="lg">
@@ -17,7 +24,7 @@ export default function Header() {
       <Navbar.Collapse id="basic-navbar-nav">
         <Nav className="ml-auto">
           {loggedIn ? (
-            <Nav.Link as={Link} to="/logout">Logout</Nav.Link>
+            <Nav.Link onClick={handleLogout}>Logout</Nav.Link>
           ) : (
             <Nav.Link as={Link} to="/signup">Sign Up</Nav.Link>
           )}
@@ -26,3 +33,4 @@ export default function Header() {
     </Navbar>
   );
 }
+
