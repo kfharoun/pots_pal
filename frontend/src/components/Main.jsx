@@ -8,21 +8,14 @@ import LoginButton from './LogIn'
 import Profile from './Profile'
 import SignUp from './SignUp'
 
-
-const ProtectedRoute = ({ component: Component }) => {
-  const { isAuthenticated } = useAuth0()
-
-  return isAuthenticated ? <Component /> : <Navigate to="/" />
-}
-
 export default function Main() {
   return (
     <div className="Main">
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/calendar" element={<ProtectedRoute component={CalendarPage} />} />
-        <Route path="/log" element={<ProtectedRoute component={DailyLog} />} />
-        <Route path="/profile" element={<ProtectedRoute component={Profile} />} />
+        <Route path="/home/:username" element={<Home />} />
+        <Route path="/calendar" element={CalendarPage} />
+        <Route path="/log" element={DailyLog} />
+        <Route path="/profile" element={Profile} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<LoginButton />} />
       </Routes>

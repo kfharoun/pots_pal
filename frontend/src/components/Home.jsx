@@ -1,36 +1,13 @@
-import React, { useState, useEffect } from "react";
-import axios from 'axios';
-import { Link } from 'react-router-dom';
-import LoginButton from './LogIn';
-import LogoutButton from './LogOut';
+import React from 'react'
+import { useParams } from 'react-router-dom'
+import axios from 'axios'
 
 export default function Home() {
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
+  const { username } = useParams()
 
-    useEffect(() => {
-        const getUser = async () => {
-            try {
-                const res = await axios.get('http://localhost:8000/users/');
-                const userData = res.data;
-                setUser(userData);
-                setLoading(false);
-            } catch (error) {
-                console.error('Cannot get user', error);
-                setLoading(false);
-            }
-        };
-        getUser();
-    }, []);
-
-    if (loading) {
-        return <div>Loading...</div>;
-    }
-    return (
-        <div className="Home">
-            <h1>✨ Welcome back, { user[0].username } ✨</h1>
-            <LogoutButton />
-            <Link to="/log">Go to Daily Log</Link>
-        </div>
-    );
+  return (
+    <div>
+      <h1>✨ welcome back, {username} ✨</h1>
+    </div>
+  )
 }

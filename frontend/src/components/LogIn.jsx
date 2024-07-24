@@ -1,37 +1,20 @@
-import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Container, Row, Col, Form, Button, Alert } from 'react-bootstrap';
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
+import { Container, Row, Col, Form, Button, Alert } from 'react-bootstrap'
 
 export default function Login() {
-
-  // got a lot of help from devpals for this
-
-  const loggedInUser = localStorage.getItem('loggedInUser')
-  
   const initialState = {
     username: '',
     password: '',
     error: ''
   }
 
-  const [formState, setFormState] = useState(initialState);
-  const [users, setUsers] = useState([]);
-  const navigate = useNavigate();
+  const [formState, setFormState] = useState(initialState)
+  const [users, setUsers] = useState([])
+  const navigate = useNavigate()
 
   useEffect(() => {
-    if (loggedInUser) {
-      const redirectToUserProfile = async (userId) => {
-        try {
-          const userResponse = await axios.get(`http://localhost:8000/users/${userId}`)
-          navigate(`/home/${userResponse.data.username}`)
-        } catch (error) {
-          console.error('Error redirecting to user profile:', error)
-        }
-      }
-      redirectToUserProfile(loggedInUser)
-    }
-
     const getUsers = async () => {
       try {
         const response = await axios.get(`http://localhost:8000/users/`)
@@ -41,22 +24,12 @@ export default function Login() {
       }
     }
     getUsers()
-  }, [loggedInUser, navigate])
-
-  const getUserId = async (username) => {
-    try {
-      const response = await axios.get(`http://localhost:8000/users/${username}/`)
-      localStorage.setItem('loggedInUser', response.data.id)
-      navigate(`/home/${username}`)
-    } catch (error) {
-      console.error("Error fetching user data:", error)
-    }
-  }
+  }, [])
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+    e.preventDefault()
 
-    const user = users.find(user => user.username === formState.username);
+    const user = users.find(user => user.username === formState.username)
 
     if (!user) {
       setFormState({
@@ -74,7 +47,8 @@ export default function Login() {
       return
     }
 
-    getUserId(user.username)
+    localStorage.setItem('loggedInUser', user.username)
+    navigate(`/home/${user.username}`)
   }
 
   const handleChange = (e) => {
@@ -91,7 +65,7 @@ export default function Login() {
         <Col md={10}>
           <h2 className="text-center mb-4">Login</h2>
           <Form onSubmit={handleSubmit}>
-            <Form.Group className="mb-4">
+            <Form.Group className="mb-3">
               <Form.Label>Username</Form.Label>
               <Form.Control
                 type="text"
@@ -101,7 +75,7 @@ export default function Login() {
                 required
               />
             </Form.Group>
-            <Form.Group className="mb-4">
+            <Form.Group className="mb-3">
               <Form.Label>Password</Form.Label>
               <Form.Control
                 type="password"
