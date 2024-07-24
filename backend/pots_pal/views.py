@@ -60,49 +60,56 @@ def sync_user(request):
 class UserList(generics.ListCreateAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [AllowAny]  # Allow anyone to create a user
+    permission_classes = [AllowAny] 
 
 class UserDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny] 
+    # permission_classes = [IsAuthenticated]
 
 class ListDay(generics.ListCreateAPIView):
     queryset = Day.objects.all()
     serializer_class = DaySerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny] 
+    # permission_classes = [IsAuthenticated]
 
 class DayDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Day.objects.all()
     serializer_class = DaySerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny] 
+    # permission_classes = [IsAuthenticated]
 
 class FavoriteList(generics.ListCreateAPIView):
     queryset = Favorite.objects.all()
     serializer_class = FavoriteSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny] 
+    # permission_classes = [IsAuthenticated]
 
 class FavoriteDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Favorite.objects.all()
     serializer_class = FavoriteSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny] 
+    # permission_classes = [IsAuthenticated]
 
 class ListData(generics.ListCreateAPIView):
     queryset = Data.objects.all()
     serializer_class = DataSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny] 
+    # permission_classes = [IsAuthenticated]
 
 class DataDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Data.objects.all()
     serializer_class = DataSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny] 
+    # permission_classes = [IsAuthenticated]
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
 class GetUserByUsernameView(generics.RetrieveAPIView):
     serializer_class = UserSerializer
-
+    permission_classes = [AllowAny] 
     def get(self, request, username):
         try:
             user = CustomUser.objects.get(username__iexact=username)

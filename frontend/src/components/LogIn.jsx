@@ -4,13 +4,16 @@ import axios from 'axios';
 import { Container, Row, Col, Form, Button, Alert } from 'react-bootstrap';
 
 export default function Login() {
-  const loggedInUser = localStorage.getItem('loggedInUser');
+
+  // got a lot of help from devpals for this
+
+  const loggedInUser = localStorage.getItem('loggedInUser')
   
   const initialState = {
     username: '',
     password: '',
     error: ''
-  };
+  }
 
   const [formState, setFormState] = useState(initialState);
   const [users, setUsers] = useState([]);
@@ -20,35 +23,35 @@ export default function Login() {
     if (loggedInUser) {
       const redirectToUserProfile = async (userId) => {
         try {
-          const userResponse = await axios.get(`http://localhost:8000/users/${userId}`);
-          navigate(`/username/${userResponse.data.username}`);
+          const userResponse = await axios.get(`http://localhost:8000/users/${userId}`)
+          navigate(`/home/${userResponse.data.username}`)
         } catch (error) {
-          console.error('Error redirecting to user profile:', error);
+          console.error('Error redirecting to user profile:', error)
         }
-      };
-      redirectToUserProfile(loggedInUser);
+      }
+      redirectToUserProfile(loggedInUser)
     }
 
     const getUsers = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/users/`);
-        setUsers(response.data);
+        const response = await axios.get(`http://localhost:8000/users/`)
+        setUsers(response.data)
       } catch (error) {
-        console.error('Error fetching users:', error);
+        console.error('Error fetching users:', error)
       }
-    };
-    getUsers();
-  }, [loggedInUser, navigate]);
+    }
+    getUsers()
+  }, [loggedInUser, navigate])
 
   const getUserId = async (username) => {
     try {
-      const response = await axios.get(`http://localhost:8000/users/${username}/`);
-      localStorage.setItem('loggedInUser', response.data.id);
-      navigate(`/username/${username}`);
+      const response = await axios.get(`http://localhost:8000/users/${username}/`)
+      localStorage.setItem('loggedInUser', response.data.id)
+      navigate(`/home/${username}`)
     } catch (error) {
-      console.error("Error fetching user data:", error);
+      console.error("Error fetching user data:", error)
     }
-  };
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -59,28 +62,28 @@ export default function Login() {
       setFormState({
         ...formState,
         error: 'Username does not exist'
-      });
-      return;
+      })
+      return
     }
 
     if (user.password !== formState.password) {
       setFormState({
         ...formState,
         error: 'Incorrect Password'
-      });
-      return;
+      })
+      return
     }
 
-    getUserId(user.username);
-  };
+    getUserId(user.username)
+  }
 
   const handleChange = (e) => {
     setFormState({
       ...formState,
       [e.target.id]: e.target.value,
       error: ''
-    });
-  };
+    })
+  }
 
   return (
     <Container className="mt-5">
@@ -114,5 +117,5 @@ export default function Login() {
         </Col>
       </Row>
     </Container>
-  );
+  )
 }
