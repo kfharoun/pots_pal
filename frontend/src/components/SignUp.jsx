@@ -1,30 +1,31 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { useAuth0 } from '@auth0/auth0-react';
-import { Form, Button, Container, Row, Col, Alert } from 'react-bootstrap';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import React, { useState } from 'react'
+import axios from 'axios'
+import { useAuth0 } from '@auth0/auth0-react'
+import { Form, Button, Container, Row, Col, Alert } from 'react-bootstrap'
+import 'bootstrap/dist/css/bootstrap.min.css'
 
 const CustomSignUp = () => {
-  const { loginWithRedirect } = useAuth0();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [username, setUsername] = useState('');
-  const [error, setError] = useState('');
+  const { loginWithRedirect } = useAuth0()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [username, setUsername] = useState('')
+  const [error, setError] = useState('')
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
     try {
-      await axios.post('http://localhost:8000/api/signup', {
+      const response = await axios.post('http://localhost:8000/users/', {
         email,
         password,
         username,
-      });
-      await loginWithRedirect();
+      })
+      console.log('Server response:', response.data)
+      await loginWithRedirect()
     } catch (error) {
+      console.error('Error signing up:', error.response?.data || error.message)
       setError('Error signing up');
-      console.error(error);
     }
-  };
+  }
 
   return (
     <Container className="mt-5">
@@ -59,13 +60,13 @@ const CustomSignUp = () => {
                 required
               />
             </Form.Group>
-            <button>Sign Up</button>
+            <Button variant="primary" type="submit" className="w-100">Sign Up</Button>
             {error && <Alert variant="danger" className="mt-3">{error}</Alert>}
           </Form>
         </Col>
       </Row>
     </Container>
-  );
-};
+  )
+}
 
-export default CustomSignUp;
+export default CustomSignUp

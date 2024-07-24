@@ -11,7 +11,7 @@ export default function Home() {
     useEffect(() => {
         const getUser = async () => {
             try {
-                const res = await axios.get('http://localhost:8000/users/1/');
+                const res = await axios.get('http://localhost:8000/users/');
                 const userData = res.data;
                 setUser(userData);
                 setLoading(false);
@@ -26,11 +26,9 @@ export default function Home() {
     if (loading) {
         return <div>Loading...</div>;
     }
-
     return (
         <div className="Home">
-            <h1>✨ Welcome back, {user ? user.username : 'Guest'} ✨</h1>
-            <LoginButton />
+            <h1>✨ Welcome back, { user[0].username } ✨</h1>
             <LogoutButton />
             <Link to="/log">Go to Daily Log</Link>
         </div>

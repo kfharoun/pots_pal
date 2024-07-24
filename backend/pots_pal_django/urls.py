@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path
 from pots_pal.views import (
     ListDay, DayDetail, ListData, DataDetail, UserList, UserDetail,
-    FavoriteList, FavoriteDetail, CustomTokenObtainPairView, signup
+    FavoriteList, FavoriteDetail, CustomTokenObtainPairView, GetUserByUsernameView, signup
 )
 from rest_framework_simplejwt.views import TokenRefreshView
 
@@ -19,4 +19,5 @@ urlpatterns = [
     path('api/token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/signup', signup),
+    path('users/<str:username>/', GetUserByUsernameView.as_view()),
 ]
