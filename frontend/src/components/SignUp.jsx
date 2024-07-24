@@ -18,14 +18,14 @@ const CustomSignUp = () => {
         email,
         password,
         username,
-      })
+      });
       console.log('Server response:', response.data)
       await loginWithRedirect()
     } catch (error) {
       console.error('Error signing up:', error.response?.data || error.message)
       setError('Error signing up');
     }
-  }
+  };
 
   return (
     <Container className="mt-5">
@@ -69,4 +69,4 @@ const CustomSignUp = () => {
   )
 }
 
-export default CustomSignUp
+export default CustomSignUp;

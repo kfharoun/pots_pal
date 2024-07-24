@@ -15,14 +15,12 @@ export default function Login() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    // Check if user is already logged in
     const loggedInUser = localStorage.getItem('loggedInUser')
     if (loggedInUser) {
       navigate(`/home/${loggedInUser}`)
       return
     }
 
-    // get users if not logged in
     const getUsers = async () => {
       try {
         const response = await axios.get(`http://localhost:8000/users/`)
@@ -56,6 +54,7 @@ export default function Login() {
     }
 
     localStorage.setItem('loggedInUser', user.username)
+    window.dispatchEvent(new Event('storage')) // Dispatch event to trigger storage change
     navigate(`/home/${user.username}`)
   }
 
@@ -83,7 +82,7 @@ export default function Login() {
                 required
               />
             </Form.Group>
-            <Form.Group className="mb-3">
+            <Form.Group className="mb-5">
               <Form.Label>Password</Form.Label>
               <Form.Control
                 type="password"

@@ -8,8 +8,17 @@ export default function Header() {
   const location = useLocation()
 
   useEffect(() => {
-    const user = localStorage.getItem('loggedInUser')
-    setLoggedIn(!!user)
+    const checkLoggedIn = () => {
+      const user = localStorage.getItem('loggedInUser')
+      setLoggedIn(!!user)
+    }
+
+    checkLoggedIn()
+
+    window.addEventListener('storage', checkLoggedIn)
+    return () => {
+      window.removeEventListener('storage', checkLoggedIn)
+    }
   }, [])
 
   const handleLogout = () => {
