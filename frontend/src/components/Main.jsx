@@ -1,17 +1,18 @@
-import React from 'react';
-import { Route, Routes, Navigate } from 'react-router-dom';
-import { useAuth0 } from '@auth0/auth0-react';
-import Home from './Home';
-import CalendarPage from './CalendarPage';
-import DailyLog from './DailyLog';
-import LoginButton from './LogIn';
-import Profile from './Profile';
+import React from 'react'
+import { Route, Routes, Navigate } from 'react-router-dom'
+import { useAuth0 } from '@auth0/auth0-react'
+import Home from './Home'
+import CalendarPage from './CalendarPage'
+import DailyLog from './DailyLog'
+import LoginButton from './LogIn'
+import Profile from './Profile'
+import SignUp from './SignUp'
 
 
 const ProtectedRoute = ({ component: Component }) => {
-  const { isAuthenticated } = useAuth0();
+  const { isAuthenticated } = useAuth0()
 
-  return isAuthenticated ? <Component /> : <Navigate to="/" />;
+  return isAuthenticated ? <Component /> : <Navigate to="/" />
 }
 
 export default function Main() {
@@ -22,6 +23,7 @@ export default function Main() {
         <Route path="/calendar" element={<ProtectedRoute component={CalendarPage} />} />
         <Route path="/log" element={<ProtectedRoute component={DailyLog} />} />
         <Route path="/profile" element={<ProtectedRoute component={Profile} />} />
+        <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<LoginButton />} />
       </Routes>
     </div>

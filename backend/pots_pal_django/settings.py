@@ -33,12 +33,23 @@ ALLOWED_HOSTS = []
 import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-# settings.py
 
-AUTH0_DOMAIN = 'dev-8zo7hrodz5c4xnle.us.auth0.com'
-AUTH0_CLIENT_ID = '2EfvtIDfFFCaQgKewi7sTc4cz7NQLTup'
-AUTH0_CLIENT_SECRET = 'V0-EX2igUk-cOU0Wu9PwyhngXVWBloZXG2K5NGQ34-Yljy9LkMhJix45BF9FGoRn'
-AUTH0_AUDIENCE = 'https://potspal.api.com'
+# settings.py
+from dotenv import load_dotenv
+import os
+
+load_dotenv()  # Load environment variables from .env file
+
+AUTH0_DOMAIN = os.getenv('AUTH0_DOMAIN')
+AUTH0_CLIENT_ID = os.getenv('AUTH0_CLIENT_ID')
+AUTH0_CLIENT_SECRET = os.getenv('AUTH0_CLIENT_SECRET')
+AUTH0_CONNECTION = os.getenv('AUTH0_CONNECTION')
+
+# For debugging purposes, print the values
+print("AUTH0_DOMAIN:", AUTH0_DOMAIN)
+print("AUTH0_CLIENT_ID:", AUTH0_CLIENT_ID)
+print("AUTH0_CLIENT_SECRET:", AUTH0_CLIENT_SECRET)
+print("AUTH0_CONNECTION:", AUTH0_CONNECTION)
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

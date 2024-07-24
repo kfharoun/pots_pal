@@ -3,7 +3,7 @@ from .models import CustomUser, Day, Data, Favorite
 
 class FavoriteSerializer(serializers.HyperlinkedModelSerializer):
     user = serializers.HyperlinkedRelatedField(
-        view_name='customuser-detail',  # Ensure this matches the URL pattern name for CustomUser detail
+        view_name='user-detail', 
         read_only=True
     )
 
@@ -13,7 +13,7 @@ class FavoriteSerializer(serializers.HyperlinkedModelSerializer):
 
 class DataSerializer(serializers.HyperlinkedModelSerializer):
     day = serializers.HyperlinkedRelatedField(
-        view_name='day-detail',  # Ensure this matches the URL pattern name for Day detail
+        view_name='day-detail', 
         read_only=True
     )
 
@@ -23,7 +23,7 @@ class DataSerializer(serializers.HyperlinkedModelSerializer):
 
 class DaySerializer(serializers.HyperlinkedModelSerializer):
     user = serializers.HyperlinkedRelatedField(
-        view_name='customuser-detail',  # Ensure this matches the URL pattern name for CustomUser detail
+        view_name='user-detail',  
         read_only=True
     )
 
