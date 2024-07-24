@@ -3,18 +3,20 @@ from django.contrib.postgres.fields import ArrayField
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
 class CustomUserManager(BaseUserManager):
-    def create_user(self, email, username, auth0_id=None, password=None, **extra_fields):
+    def create_user(self, email, username, auth0_id=None, **extra_fields):
         if not email:
             raise ValueError('The Email field must be set')
+        if not auth0_id:
+            raise ValueError('The Auth0 ID must be set')
         email = self.normalize_email(email)
         user = self.model(email=email, username=username, auth0_id=auth0_id, **extra_fields)
-        user.set_password(password)
+        user.set_unusable_password()
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, username, password=None, **extra_fields):
+    def create_superuser(self, email, username, auth0_id=None, **extra_fields):
         extra_fields.setdefault('is_admin', True)
-        return self.create_user(email, username, auth0_id=None, password=password, **extra_fields)
+        return self.create_user(email, username, auth0_id=auth0_id, **extra_fields)
 
 class CustomUser(AbstractBaseUser):
     email = models.EmailField(unique=True)
