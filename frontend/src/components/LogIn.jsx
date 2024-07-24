@@ -15,6 +15,14 @@ export default function Login() {
   const navigate = useNavigate()
 
   useEffect(() => {
+    // Check if user is already logged in
+    const loggedInUser = localStorage.getItem('loggedInUser')
+    if (loggedInUser) {
+      navigate(`/home/${loggedInUser}`)
+      return
+    }
+
+    // get users if not logged in
     const getUsers = async () => {
       try {
         const response = await axios.get(`http://localhost:8000/users/`)
@@ -24,7 +32,7 @@ export default function Login() {
       }
     }
     getUsers()
-  }, [])
+  }, [navigate])
 
   const handleSubmit = (e) => {
     e.preventDefault()

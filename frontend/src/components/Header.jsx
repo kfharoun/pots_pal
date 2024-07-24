@@ -22,7 +22,7 @@ export default function Header() {
 
   return (
     <Navbar bg="light" expand="lg">
-      <Navbar.Brand href="/"><img src='https://i.imgur.com/QpaCVKn.png' width={40} alt="Logo" /></Navbar.Brand>
+      <Navbar.Brand href="/login"><img src='https://i.imgur.com/QpaCVKn.png' width={40} alt="Logo" /></Navbar.Brand>
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav">
         <Nav className="ml-auto">
