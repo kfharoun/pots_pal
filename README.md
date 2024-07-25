@@ -22,3 +22,5 @@
 
 ![component hierarchy](https://i.imgur.com/l6sMfjH.png)
 
+## Sources 
+[generics](https://testdriven.io/blog/drf-views-part-2/)

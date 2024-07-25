@@ -5,7 +5,6 @@ import Home from './Home'
 import CalendarPage from './CalendarPage'
 import DailyLog from './DailyLog'
 import LoginButton from './LogIn'
-import Profile from './Profile'
 import SignUp from './SignUp'
 
 export default function Main() {
@@ -13,9 +12,8 @@ export default function Main() {
     <div className="Main">
       <Routes>
         <Route path="/home/:username" element={<Home />} />
-        <Route path="/calendar" element={CalendarPage} />
-        <Route path="/log" element={DailyLog} />
-        <Route path="/profile" element={Profile} />
+        <Route path="/calendar" element={<CalendarPage/>} />
+        <Route path="/log/:username" element={<DailyLog/>} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<LoginButton />} />
       </Routes>

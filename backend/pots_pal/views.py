@@ -120,6 +120,84 @@ class GetUserByUsernameView(generics.RetrieveAPIView):
         except Exception as e:
             return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+class DaysByUsernameView(generics.ListCreateAPIView):
+    serializer_class = DaySerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        username = self.kwargs['username']
+        return Day.objects.filter(user__username__iexact=username)
+
+    def perform_create(self, serializer):
+        username = self.kwargs['username']
+        user = get_object_or_404(CustomUser, username=username)
+        serializer.save(user=user)
+
+    def put(self, request, username, pk):
+        user = get_object_or_404(CustomUser, username=username)
+        day = get_object_or_404(Day, pk=pk, user=user)
+        serializer = DaySerializer(day, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save(user=user)
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class DataByUsernameView(generics.ListCreateAPIView):
+    serializer_class = DataSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        username = self.kwargs['username']
+        return Data.objects.filter(day__user__username__iexact=username)
+
+    def perform_create(self, serializer):
+        username = self.kwargs['username']
+        day_id = self.request.data.get('day')
+        user = get_object_or_404(CustomUser, username=username)
+        day = get_object_or_404(Day, id=day_id, user=user)
+        serializer.save(day=day)
+
+    def put(self, request, username, pk):
+        user = get_object_or_404(CustomUser, username=username)
+        data_entry = get_object_or_404(Data, pk=pk, day__user=user)
+        serializer = DataSerializer(data_entry, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class DayUpdateByUsernameView(generics.RetrieveUpdateAPIView):
+    serializer_class = DaySerializer
+    permission_classes = [AllowAny]
+
+    def get_object(self):
+        username = self.kwargs['username']
+        pk = self.kwargs['pk']
+        user = get_object_or_404(CustomUser, username=username)
+        return get_object_or_404(Day, pk=pk, user=user)
+
+    def perform_update(self, serializer):
+        username = self.kwargs['username']
+        user = get_object_or_404(CustomUser, username=username)
+        serializer.save(user=user)
+
+class DataUpdateByUsernameView(generics.RetrieveUpdateAPIView):
+    serializer_class = DataSerializer
+    permission_classes = [AllowAny]
+
+    def get_object(self):
+        username = self.kwargs['username']
+        pk = self.kwargs['pk']
+        user = get_object_or_404(CustomUser, username=username)
+        return get_object_or_404(Data, pk=pk, day__user=user)
+
+    def perform_update(self, serializer):
+        username = self.kwargs['username']
+        day_id = serializer.validated_data.get('day').id
+        user = get_object_or_404(CustomUser, username=username)
+        day = get_object_or_404(Day, id=day_id, user=user)
+        serializer.save(day=day)
+
 import requests
 from django.http import JsonResponse
 from rest_framework.decorators import api_view

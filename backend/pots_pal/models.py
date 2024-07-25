@@ -64,14 +64,14 @@ class Day(models.Model):
 
 class Data(models.Model):
     day = models.ForeignKey(Day, on_delete=models.CASCADE, related_name='data')
-    meal_item = ArrayField(ArrayField(models.CharField(max_length=100, blank=True)), size=10)
+    meal_item = ArrayField(models.CharField(max_length=100, blank=True), size=10)
     favorite_meal = models.BooleanField(default=False)
     water_intake = models.IntegerField(default=0)
     salt_intake = models.IntegerField(default=0)
     weather = models.IntegerField(default=0)
     low_heart_rate = models.IntegerField(default=0)
     high_heart_rate = models.IntegerField(default=0)
-    activity_item = ArrayField(ArrayField(models.CharField(max_length=100, blank=True)), size=10)
+    activity_item = ArrayField(models.CharField(max_length=100, blank=True), size=10)
     favorite_activity = models.BooleanField(default=False)
 
     class Meta:

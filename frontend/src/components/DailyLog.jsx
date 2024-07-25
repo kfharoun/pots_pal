@@ -1,3 +1,8 @@
+import { useParams } from "react-router-dom"
+
 export default function DailyLog() {
-    return <h1>daily log</h1>
+
+  const {username} = useParams()
+
+    return <h1>{username}'s daily log</h1>
 }

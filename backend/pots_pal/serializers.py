@@ -1,30 +1,32 @@
 from rest_framework import serializers
 from .models import CustomUser, Day, Data, Favorite
 
-class FavoriteSerializer(serializers.HyperlinkedModelSerializer):
-    user = serializers.HyperlinkedRelatedField(
-        view_name='user-detail', 
-        read_only=True
+class FavoriteSerializer(serializers.ModelSerializer):
+    user = serializers.SlugRelatedField(
+        slug_field='username',
+        queryset=CustomUser.objects.all()
     )
 
     class Meta:
         model = Favorite
         fields = ['id', 'user', 'food_items', 'activity_items']
 
-class DataSerializer(serializers.HyperlinkedModelSerializer):
-    day = serializers.HyperlinkedRelatedField(
-        view_name='day-detail', 
-        read_only=True
+class DataSerializer(serializers.ModelSerializer):
+    day = serializers.SlugRelatedField(
+        slug_field='id',
+        queryset=Day.objects.all()
     )
+    username = serializers.CharField(source='day.user.username', read_only=True)
 
     class Meta:
         model = Data
-        fields = ['id', 'day', 'meal_item', 'favorite_meal', 'water_intake', 'salt_intake', 'weather', 'low_heart_rate', 'high_heart_rate', 'activity_item', 'favorite_activity']
+        fields = ['id', 'day', 'meal_item', 'favorite_meal', 'water_intake', 'salt_intake', 'weather', 'low_heart_rate', 'high_heart_rate', 'activity_item', 'favorite_activity', 'username']
 
-class DaySerializer(serializers.HyperlinkedModelSerializer):
-    user = serializers.HyperlinkedRelatedField(
-        view_name='user-detail',  
-        read_only=True
+class DaySerializer(serializers.ModelSerializer):
+    user = serializers.SlugRelatedField(
+        slug_field='username',
+        queryset=CustomUser.objects.all(),
+        required=False
     )
 
     data = DataSerializer(
@@ -36,7 +38,8 @@ class DaySerializer(serializers.HyperlinkedModelSerializer):
         model = Day
         fields = ['id', 'user', 'date', 'good_day', 'neutral_day', 'nauseous', 'fainting', 'bed_bound', 'data']
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
+
+class UserSerializer(serializers.ModelSerializer):
     days = DaySerializer(
         many=True,
         read_only=True
@@ -49,4 +52,3 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['id', 'username', 'email', 'auth0_id', 'password', 'favorite', 'days']
-
