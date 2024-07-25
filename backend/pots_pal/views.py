@@ -101,8 +101,17 @@ class ListData(generics.ListCreateAPIView):
 class DataDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Data.objects.all()
     serializer_class = DataSerializer
-    permission_classes = [AllowAny] 
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
+    
+
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
@@ -180,6 +189,43 @@ class DayUpdateByUsernameView(generics.RetrieveUpdateAPIView):
         username = self.kwargs['username']
         user = get_object_or_404(CustomUser, username=username)
         serializer.save(user=user)
+
+class DayByUsernameDateView(generics.ListCreateAPIView):
+    serializer_class = DaySerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        username = self.kwargs['username']
+        date = self.kwargs['date']
+        return Day.objects.filter(user__username__iexact=username, date=date)
+
+    def perform_create(self, serializer):
+        username = self.kwargs['username']
+        date = self.kwargs['date']
+        user = get_object_or_404(CustomUser, username=username)
+        day, created = Day.objects.get_or_create(user=user, date=date)
+        serializer.save(user=user, date=date)
+
+    def get(self, request, *args, **kwargs):
+        username = self.kwargs['username']
+        date = self.kwargs['date']
+        user = get_object_or_404(CustomUser, username=username)
+        day = Day.objects.filter(user=user, date=date).first()
+        if day:
+            serializer = DaySerializer(day)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    def put(self, request, *args, **kwargs):
+        username = self.kwargs['username']
+        date = self.kwargs['date']
+        user = get_object_or_404(CustomUser, username=username)
+        day = get_object_or_404(Day, user=user, date=date)
+        serializer = DaySerializer(day, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class DataUpdateByUsernameView(generics.RetrieveUpdateAPIView):
     serializer_class = DataSerializer

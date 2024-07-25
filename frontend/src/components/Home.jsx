@@ -15,8 +15,46 @@ export default function Home() {
     salt_intake: 0,
     water_intake: 0,
   })
+  const [existingEntry, setExistingEntry] = useState(null)
+  const [existingData, setExistingData] = useState(null)
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(false)
+  const currentDate = new Date().toISOString().split('T')[0]
+
+  useEffect(() => {
+    const getExisting = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8000/days/${username}/${currentDate}/`
+        )
+        if (response.status === 200) {
+          const entry = response.data
+          setExistingEntry(entry)
+          if (entry.data.length > 0) {
+            const data = entry.data[0]
+            setExistingData(data)
+            setFormData({
+              good_day: entry.good_day,
+              neutral_day: entry.neutral_day,
+              nauseous: entry.nauseous,
+              fainting: entry.fainting,
+              bed_bound: entry.bed_bound,
+              salt_intake: data.salt_intake,
+              water_intake: data.water_intake,
+            })
+          }
+        }
+      } catch (error) {
+        if (error.response && error.response.status === 404) {
+          setExistingEntry(null)
+          setExistingData(null)
+        } else {
+          console.error('Error getting existing entry:', error)
+        }
+      }
+    }
+    getExisting()
+  }, [username, currentDate])
 
   const handleChange = (e) => {
     const { id, checked, value, type } = e.target
@@ -43,10 +81,8 @@ export default function Home() {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    const currentDate = new Date().toISOString().split('T')[0]
-
     const dayData = {
-      date: currentDate,
+      user: username,
       good_day: formData.good_day,
       neutral_day: formData.neutral_day,
       nauseous: formData.nauseous,
@@ -54,42 +90,76 @@ export default function Home() {
       bed_bound: formData.bed_bound,
     }
 
+    const dataData = {
+      water_intake: formData.water_intake,
+      salt_intake: formData.salt_intake,
+    }
+
     try {
-      const dayResponse = await axios.post(
-        `http://localhost:8000/days/${username}/`,
-        dayData,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
+      if (existingEntry) {
+        // Update existing day without sending the date
+        await axios.patch(
+          `http://localhost:8000/days/${username}/${existingEntry.id}/`,
+          dayData,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        )
+        
+        // Check if there is existing data for the day
+        if (existingData) {
+          // Update existing data with PATCH
+          await axios.patch(
+            `http://localhost:8000/data/${existingData.id}/`,
+            dataData,
+            {
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            }
+          )
+        } else {
+          // Create new data entry
+          await axios.post(
+            `http://localhost:8000/data/`,
+            { ...dataData, day: existingEntry.id },
+            {
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            }
+          )
         }
-      )
-
-      const dayId = dayResponse.data.id
-
-      const dataData = {
-        day: dayId,
-        water_intake: formData.water_intake,
-        salt_intake: formData.salt_intake,
-        meal_item: ['seperate', 'by', 'comma'],
-        activity_item: ['seperate', 'by', 'comma']
+      } else {
+        // Create new day entry including the date
+        const dayResponse = await axios.post(
+          `http://localhost:8000/days/`,
+          { ...dayData, date: currentDate },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        )
+        const dayId = dayResponse.data.id
+        // Create new data entry
+        await axios.post(
+          `http://localhost:8000/data/`,
+          { ...dataData, day: dayId },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        )
       }
-
-      const dataResponse = await axios.post(
-        `http://localhost:8000/data/${username}/`,
-        dataData,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      )
 
       setSuccess(true)
       setError(null)
-      console.log('Success:', dataResponse.data)
     } catch (err) {
-      setError(err.response ? err.response.data : 'error submitting data')
+      setError(err.response ? err.response.data : 'Error submitting data')
       setSuccess(false)
     }
   }
@@ -175,7 +245,9 @@ export default function Home() {
             {error && <Alert variant='danger' className='mt-3'>{error}</Alert>}
             {success && <Alert variant='success' className='mt-3'>Data submitted successfully!</Alert>}
 
-            <Button type='submit' variant='primary' className='mt-4'>Submit</Button>
+            <Button type='submit' variant='primary' className='mt-4'>
+              {existingEntry ? 'Update' : 'Submit'}
+            </Button>
           </Form>
         </Col>
       </Row>

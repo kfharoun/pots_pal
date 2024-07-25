@@ -21,7 +21,11 @@ class DataSerializer(serializers.ModelSerializer):
     class Meta:
         model = Data
         fields = ['id', 'day', 'meal_item', 'favorite_meal', 'water_intake', 'salt_intake', 'weather', 'low_heart_rate', 'high_heart_rate', 'activity_item', 'favorite_activity', 'username']
-
+        extra_kwargs = {
+            'day': {'required': False},
+            'meal_item': {'required': False},
+            'activity_item': {'required': False},
+        }
 class DaySerializer(serializers.ModelSerializer):
     user = serializers.SlugRelatedField(
         slug_field='username',

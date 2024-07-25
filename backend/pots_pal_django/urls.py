@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path
 from pots_pal.views import (
     ListDay, DayDetail, ListData, DataDetail, UserList, UserDetail,
-    FavoriteList, FavoriteDetail, CustomTokenObtainPairView, GetUserByUsernameView, DataByUsernameView, DaysByUsernameView, signup, DayUpdateByUsernameView, DataUpdateByUsernameView
+    FavoriteList, FavoriteDetail, CustomTokenObtainPairView, GetUserByUsernameView, DataByUsernameView, DaysByUsernameView, signup, DayUpdateByUsernameView, DataUpdateByUsernameView, DayByUsernameDateView
 )
 from rest_framework_simplejwt.views import TokenRefreshView
 
@@ -14,6 +14,7 @@ urlpatterns = [
     # update and create by username
     path('days/<str:username>/', DaysByUsernameView.as_view(), name='days-by-username'),
     path('days/<str:username>/<int:pk>/', DayUpdateByUsernameView.as_view(), name='day-update-by-username'),
+    path('days/<str:username>/<str:date>/', DayByUsernameDateView.as_view(), name='day-username-view' ),
 
     path('data/', ListData.as_view(), name='list-data'),
     path('data/<int:pk>/', DataDetail.as_view(), name='data-detail'),

@@ -58,6 +58,7 @@ class Day(models.Model):
 
     class Meta:
         db_table = 'days'
+        unique_together = ('user', 'date')
 
     def __str__(self):
         return str(self.date)
