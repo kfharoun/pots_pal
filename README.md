@@ -23,4 +23,11 @@
 ![component hierarchy](https://i.imgur.com/l6sMfjH.png)
 
 ## Sources 
-[generics](https://testdriven.io/blog/drf-views-part-2/)
+* [generics](https://testdriven.io/blog/drf-views-part-2/)
+
+* [empty fields](https://medium.com/@maruthurnavin/handling-empty-and-optional-fields-in-django-b7ef7979e83e#:~:text=Model%20Forms%3A%20When%20creating%20forms,in%20forms%20using%20blank%3DTrue.)
+
+* [dev pals for login](https://github.com/kingwilldabeast/dev-pals)
+
+* chatgpt
+    * helped learn django error coding formats
