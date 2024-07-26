@@ -4,6 +4,7 @@ import axios from 'axios'
 import { Container, Row, Col, Form, Button, Alert } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import SaltIntake from './imageComponents/SaltIntake'
+import WaterIntake from './imageComponents/WaterIntake'
 
 export default function Home() {
   const { username } = useParams()
@@ -68,14 +69,14 @@ export default function Home() {
   const handleIncrement = (field, increment) => {
     setFormData((prevFormData) => ({
       ...prevFormData,
-      [field]: prevFormData[field] + increment > 4800 ? 4800 : prevFormData[field] + increment,
+      [field]: prevFormData[field] + increment,
     }))
   }
 
   const handleDecrement = (field, decrement) => {
     setFormData((prevFormData) => ({
       ...prevFormData,
-      [field]: prevFormData[field] - decrement < 0 ? 0 : prevFormData[field] - decrement,
+      [field]: prevFormData[field] - decrement,
     }))
   }
 
@@ -94,19 +95,23 @@ export default function Home() {
     const dataData = {
       water_intake: formData.water_intake,
       salt_intake: formData.salt_intake,
+      meal_item: ["seperate", "with", "commas"],
+      activity_item: ["seperate", "with", "commas"]
     }
 
     try {
       if (existingEntry) {
-        // Update existing day with PATCH, including the dayId
+        // Update existing day without sending the date
         await axios.patch(
-          `http://localhost:8000/days/${username}/${currentDate}/${existingEntry.id}/`,
+          `http://localhost:8000/days/${username}/${existingEntry.id}/`,
           dayData,
           {
             headers: {
               'Content-Type': 'application/json',
             },
+            
           }
+          
         )
         
         // Check if there is existing data for the day
@@ -159,11 +164,13 @@ export default function Home() {
 
       setSuccess(true)
       setError(null)
+      window.location.reload()
     } catch (err) {
       setError(err.response ? err.response.data : 'Error submitting data')
       setSuccess(false)
     }
   }
+
 
   return (
     <Container className='Home mt-5'>
@@ -214,28 +221,29 @@ export default function Home() {
               checked={formData.bed_bound}
               onChange={handleChange}
             />
+            <h3 className='mt-4'>Represents 21oz of water</h3>
 
+            <Form.Group controlId='water_intake' className='d-flex align-items-center'>
+              <Form.Label className='mr-3'></Form.Label>
+              <WaterIntake
+                waterIntake={formData.water_intake}
+                onIncrement={() => handleIncrement('water_intake', 21)}
+                onDecrement={() => handleDecrement('water_intake', 21)}
+              />
+            </Form.Group>
+            
             <h3 className='mt-4'>Represents 800mgs of sodium</h3>
 
             <Form.Group controlId='salt_intake' className='d-flex align-items-center'>
               <Form.Label className='mr-3'></Form.Label>
-              <Button variant='secondary' onClick={() => handleDecrement('salt_intake', 800)}>-</Button>
-              <SaltIntake saltIntake={formData.salt_intake} />
-              <Button variant='secondary' onClick={() => handleIncrement('salt_intake', 800)}>+</Button>
+              <SaltIntake
+                saltIntake={formData.salt_intake}
+                onIncrement={() => handleIncrement('salt_intake', 800)}
+                onDecrement={() => handleDecrement('salt_intake', 800)}
+              />
             </Form.Group>
 
-            <Form.Group controlId='water_intake' className='d-flex align-items-center'>
-              <Form.Label className='mr-3'>Water Intake (ml)</Form.Label>
-              <Button variant='secondary' onClick={() => handleDecrement('water_intake', 21)}>-</Button>
-              <Form.Control
-                type='number'
-                value={formData.water_intake}
-                onChange={handleChange}
-                min='0'
-                className='ml-3'
-              />
-              <Button variant='secondary' onClick={() => handleIncrement('water_intake', 21)}>+</Button>
-            </Form.Group>
+
             {error && <Alert variant='danger' className='mt-3'>{error}</Alert>}
             {success && <Alert variant='success' className='mt-3'>Data submitted successfully!</Alert>}
 

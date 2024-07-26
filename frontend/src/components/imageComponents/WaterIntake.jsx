@@ -1,10 +1,9 @@
 import React from 'react'
 
-const WaterIntake = ({ waterintake }) => {
-  const fullWaterImage = 'https://i.imgur.com/ZxaQX3K.png'
-  const emptyWaterImage = 'https://i.imgur.com/U6ZXpH6.png'
-  const maxWater = 128
-  const saltUnits = waterintake / 21.33 + 2
+const WaterIntake = ({ waterIntake, onIncrement, onDecrement }) => {
+  const fullWaterImage = 'https://i.imgur.com/dgyhEIv.png'
+  const emptyWaterImage = 'https://i.imgur.com/TQ2YOV8.png'
+  const waterUnits = waterIntake / 21
 
   const images = []
 
@@ -12,9 +11,12 @@ const WaterIntake = ({ waterintake }) => {
     images.push(
       <img
         key={i}
-        src={i < saltUnits ? fullWaterImage : emptyWaterImage}
+        src={i < waterUnits ? fullWaterImage : emptyWaterImage}
         alt="Water level"
         width="50px"
+        height="auto"
+        style={{ cursor: 'pointer' }}
+        onClick={() => i < waterUnits ? onDecrement() : onIncrement()}
       />
     )
   }

@@ -1,9 +1,8 @@
 import React from 'react'
 
-const SaltIntake = ({ saltIntake }) => {
+const SaltIntake = ({ saltIntake, onIncrement, onDecrement }) => {
   const fullSaltImage = 'https://i.imgur.com/ZxaQX3K.png'
   const emptySaltImage = 'https://i.imgur.com/U6ZXpH6.png'
-  const maxSalt = 4800
   const saltUnits = saltIntake / 800
 
   const images = []
@@ -15,6 +14,9 @@ const SaltIntake = ({ saltIntake }) => {
         src={i < saltUnits ? fullSaltImage : emptySaltImage}
         alt="Salt level"
         width="50px"
+        height="auto"
+        style={{ cursor: 'pointer' }}
+        onClick={() => i < saltUnits ? onDecrement() : onIncrement()}
       />
     )
   }
