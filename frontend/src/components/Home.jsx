@@ -93,6 +93,8 @@ export default function Home() {
     const dataData = {
       water_intake: formData.water_intake,
       salt_intake: formData.salt_intake,
+      meal_item: ["seperate", "with", "commas"],
+      activity_item: ["seperate", "with", "commas"]
     }
 
     try {
