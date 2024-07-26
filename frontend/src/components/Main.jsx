@@ -12,7 +12,7 @@ export default function Main() {
     <div className="Main">
       <Routes>
         <Route path="/home/:username" element={<Home />} />
-        <Route path="/calendar" element={<CalendarPage/>} />
+        <Route path="/calendar/:username" element={<CalendarPage/>} />
         <Route path="/log/:username" element={<DailyLog/>} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<LoginButton />} />

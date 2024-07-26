@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef} from 'react'
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
 import { Container, Row, Col, Form, Button, Alert } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import SaltIntake from './imageComponents/SaltIntake'
 import WaterIntake from './imageComponents/WaterIntake'
+import MoodSelector from './imageComponents/MoodSelector'
 
 export default function Home() {
   const { username } = useParams()
@@ -17,10 +18,12 @@ export default function Home() {
     salt_intake: 0,
     water_intake: 0,
   })
+  const [selectedMood, setSelectedMood] = useState(null)
   const [existingEntry, setExistingEntry] = useState(null)
   const [existingData, setExistingData] = useState(null)
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(false)
+  const formRef = useRef(null)
   const currentDate = new Date().toISOString().split('T')[0]
 
   useEffect(() => {
@@ -44,6 +47,11 @@ export default function Home() {
               salt_intake: data.salt_intake,
               water_intake: data.water_intake,
             })
+            if (entry.good_day) setSelectedMood('good_day')
+            if (entry.neutral_day) setSelectedMood('neutral_day')
+            if (entry.nauseous) setSelectedMood('nauseous')
+            if (entry.fainting) setSelectedMood('fainting')
+            if (entry.bed_bound) setSelectedMood('bed_bound')
           }
         }
       } catch (error) {
@@ -80,6 +88,24 @@ export default function Home() {
     }))
   }
 
+  const handleMoodSelect = (mood) => {
+    setSelectedMood(mood)
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      good_day: mood === 'good_day',
+      neutral_day: mood === 'neutral_day',
+      nauseous: mood === 'nauseous',
+      fainting: mood === 'fainting',
+      bed_bound: mood === 'bed_bound',
+    }))
+  }
+
+  // const handleFormSubmit = (e) => {
+  //   e.preventDefault()
+  //   formRef.current.submit()
+  //   Navigate(`/log/${username}`)
+  // }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
 
@@ -95,8 +121,8 @@ export default function Home() {
     const dataData = {
       water_intake: formData.water_intake,
       salt_intake: formData.salt_intake,
-      meal_item: ["seperate", "with", "commas"],
-      activity_item: ["seperate", "with", "commas"]
+      meal_item: ["separate", "with", "commas"],
+      activity_item: ["separate", "with", "commas"]
     }
 
     try {
@@ -109,11 +135,9 @@ export default function Home() {
             headers: {
               'Content-Type': 'application/json',
             },
-            
           }
-          
         )
-        
+
         // Check if there is existing data for the day
         if (existingData) {
           // Update existing data with PATCH
@@ -172,6 +196,7 @@ export default function Home() {
   }
 
 
+
   return (
     <Container className='Home mt-5'>
       <Row className='justify-content-center'>
@@ -184,43 +209,8 @@ export default function Home() {
           </Link>
 
           <Form onSubmit={handleSubmit} className='mt-4'>
-            <h3>How are you feeling today?</h3>
-
-            <Form.Check
-              type='checkbox'
-              id='good_day'
-              label='Good Day'
-              checked={formData.good_day}
-              onChange={handleChange}
-            />
-            <Form.Check
-              type='checkbox'
-              id='neutral_day'
-              label='Neutral Day'
-              checked={formData.neutral_day}
-              onChange={handleChange}
-            />
-            <Form.Check
-              type='checkbox'
-              id='nauseous'
-              label='Nauseous'
-              checked={formData.nauseous}
-              onChange={handleChange}
-            />
-            <Form.Check
-              type='checkbox'
-              id='fainting'
-              label='Fainting'
-              checked={formData.fainting}
-              onChange={handleChange}
-            />
-            <Form.Check
-              type='checkbox'
-              id='bed_bound'
-              label='Bed Bound'
-              checked={formData.bed_bound}
-              onChange={handleChange}
-            />
+          <h3>How are you feeling today?</h3>
+          <MoodSelector selectedMood={selectedMood} onSelectMood={handleMoodSelect} />
             <h3 className='mt-4'>Represents 21oz of water</h3>
 
             <Form.Group controlId='water_intake' className='d-flex align-items-center'>
@@ -231,7 +221,7 @@ export default function Home() {
                 onDecrement={() => handleDecrement('water_intake', 21)}
               />
             </Form.Group>
-            
+
             <h3 className='mt-4'>Represents 800mgs of sodium</h3>
 
             <Form.Group controlId='salt_intake' className='d-flex align-items-center'>

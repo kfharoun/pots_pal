@@ -31,3 +31,5 @@
 
 * chatgpt
     * helped learn django error coding formats
+
+* [learning about backend data rendering costs](https://community.weweb.io/t/fetching-data-and-filtering-best-practices/1001/12)
