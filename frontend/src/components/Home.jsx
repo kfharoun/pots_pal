@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom'
 import axios from 'axios'
 import { Container, Row, Col, Form, Button, Alert } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
+import SaltIntake from './imageComponents/SaltIntake'
 
 export default function Home() {
   const { username } = useParams()
@@ -67,14 +68,14 @@ export default function Home() {
   const handleIncrement = (field, increment) => {
     setFormData((prevFormData) => ({
       ...prevFormData,
-      [field]: prevFormData[field] + increment,
+      [field]: prevFormData[field] + increment > 4800 ? 4800 : prevFormData[field] + increment,
     }))
   }
 
   const handleDecrement = (field, decrement) => {
     setFormData((prevFormData) => ({
       ...prevFormData,
-      [field]: prevFormData[field] - decrement,
+      [field]: prevFormData[field] - decrement < 0 ? 0 : prevFormData[field] - decrement,
     }))
   }
 
@@ -93,15 +94,13 @@ export default function Home() {
     const dataData = {
       water_intake: formData.water_intake,
       salt_intake: formData.salt_intake,
-      meal_item: ["seperate", "with", "commas"],
-      activity_item: ["seperate", "with", "commas"]
     }
 
     try {
       if (existingEntry) {
-        // Update existing day without sending the date
+        // Update existing day with PATCH, including the dayId
         await axios.patch(
-          `http://localhost:8000/days/${username}/${existingEntry.id}/`,
+          `http://localhost:8000/days/${username}/${currentDate}/${existingEntry.id}/`,
           dayData,
           {
             headers: {
@@ -219,21 +218,15 @@ export default function Home() {
             <h3 className='mt-4'>Represents 800mgs of sodium</h3>
 
             <Form.Group controlId='salt_intake' className='d-flex align-items-center'>
-              <Form.Label className='mr-3'>Sodium Intake</Form.Label>
+              <Form.Label className='mr-3'></Form.Label>
               <Button variant='secondary' onClick={() => handleDecrement('salt_intake', 800)}>-</Button>
-              <Form.Control
-                type='number'
-                value={formData.salt_intake}
-                onChange={handleChange}
-                min='0'
-                className='ml-3'
-              />
+              <SaltIntake saltIntake={formData.salt_intake} />
               <Button variant='secondary' onClick={() => handleIncrement('salt_intake', 800)}>+</Button>
             </Form.Group>
 
             <Form.Group controlId='water_intake' className='d-flex align-items-center'>
               <Form.Label className='mr-3'>Water Intake (ml)</Form.Label>
-              <Button variant='secondary' onClick={() => handleDecrement('water_intake', 16)}>-</Button>
+              <Button variant='secondary' onClick={() => handleDecrement('water_intake', 21)}>-</Button>
               <Form.Control
                 type='number'
                 value={formData.water_intake}
@@ -241,9 +234,8 @@ export default function Home() {
                 min='0'
                 className='ml-3'
               />
-              <Button variant='secondary' onClick={() => handleIncrement('water_intake', 16)}>+</Button>
+              <Button variant='secondary' onClick={() => handleIncrement('water_intake', 21)}>+</Button>
             </Form.Group>
-
             {error && <Alert variant='danger' className='mt-3'>{error}</Alert>}
             {success && <Alert variant='success' className='mt-3'>Data submitted successfully!</Alert>}
 
