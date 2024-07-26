@@ -33,3 +33,5 @@
     * helped learn django error coding formats
 
 * [learning about backend data rendering costs](https://community.weweb.io/t/fetching-data-and-filtering-best-practices/1001/12)
+
+* [troubleshooting date-fns](https://stackoverflow.com/questions/63161711/react-native-and-date-fns-problem-with-inserting-current-date)

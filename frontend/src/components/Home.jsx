@@ -1,11 +1,11 @@
-import { useEffect, useState, useRef} from 'react'
-import { useParams } from 'react-router-dom'
+import { useEffect, useState, useRef } from 'react'
+import { Link, useParams } from 'react-router-dom'
 import axios from 'axios'
-import { Container, Row, Col, Form, Button, Alert } from 'react-bootstrap'
-import { Link } from 'react-router-dom'
+import { Row, Col, Form, Button, Alert } from 'react-bootstrap'
 import SaltIntake from './imageComponents/SaltIntake'
 import WaterIntake from './imageComponents/WaterIntake'
 import MoodSelector from './imageComponents/MoodSelector'
+import Header from './Header'
 
 export default function Home() {
   const { username } = useParams()
@@ -24,7 +24,7 @@ export default function Home() {
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(false)
   const formRef = useRef(null)
-  const currentDate = new Date().toISOString().split('T')[0]
+  const [currentDate, setCurrentDate] = useState(new Date().toISOString().split('T')[0])
 
   useEffect(() => {
     const getExisting = async () => {
@@ -52,12 +52,35 @@ export default function Home() {
             if (entry.nauseous) setSelectedMood('nauseous')
             if (entry.fainting) setSelectedMood('fainting')
             if (entry.bed_bound) setSelectedMood('bed_bound')
+          } else {
+            // No existing data for the day
+            setExistingData(null)
+            setFormData({
+              good_day: false,
+              neutral_day: false,
+              nauseous: false,
+              fainting: false,
+              bed_bound: false,
+              salt_intake: 0,
+              water_intake: 0,
+            })
+            setSelectedMood(null)
           }
         }
       } catch (error) {
         if (error.response && error.response.status === 404) {
           setExistingEntry(null)
           setExistingData(null)
+          setFormData({
+            good_day: false,
+            neutral_day: false,
+            nauseous: false,
+            fainting: false,
+            bed_bound: false,
+            salt_intake: 0,
+            water_intake: 0,
+          })
+          setSelectedMood(null)
         } else {
           console.error('Error getting existing entry:', error)
         }
@@ -100,11 +123,10 @@ export default function Home() {
     }))
   }
 
-  // const handleFormSubmit = (e) => {
-  //   e.preventDefault()
-  //   formRef.current.submit()
-  //   Navigate(`/log/${username}`)
-  // }
+  const handleFormSubmit = (e) => {
+    e.preventDefault()
+    formRef.current.submit()
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -139,7 +161,8 @@ export default function Home() {
         )
 
         // Check if there is existing data for the day
-        if (existingData) {
+        if
+        (existingData) {
           // Update existing data with PATCH
           await axios.patch(
             `http://localhost:8000/data/${existingData.id}/`,
@@ -195,22 +218,22 @@ export default function Home() {
     }
   }
 
-
+  const handleDateChange = (newDate) => {
+    setCurrentDate(newDate)
+  }
 
   return (
-    <Container className='Home mt-5'>
+    <>
+      <Header currentDate={currentDate} onDateChange={handleDateChange} />
+      
       <Row className='justify-content-center'>
         <Col md={10} className='text-center'>
-          <h1 className='HomeWelcome'>✨ Welcome back, {username} ✨</h1>
-          <Link to={`/log/${username}`}>
-            <Button variant='primary' className='mt-3'>
-              Daily Log
-            </Button>
-          </Link>
+          <h1 className='HomeWelcome'>✨ welcome back, {username} ✨</h1>
+          <Link to={`/log/${username}`}><button>daily log</button></Link>
 
-          <Form onSubmit={handleSubmit} className='mt-4'>
-          <h3>How are you feeling today?</h3>
-          <MoodSelector selectedMood={selectedMood} onSelectMood={handleMoodSelect} />
+          <Form ref={formRef} onSubmit={handleSubmit} className='mt-4'>
+            <h3>How are you feeling today?</h3>
+            <MoodSelector selectedMood={selectedMood} onSelectMood={handleMoodSelect} />
             <h3 className='mt-4'>Represents 21oz of water</h3>
 
             <Form.Group controlId='water_intake' className='d-flex align-items-center'>
@@ -233,7 +256,6 @@ export default function Home() {
               />
             </Form.Group>
 
-
             {error && <Alert variant='danger' className='mt-3'>{error}</Alert>}
             {success && <Alert variant='success' className='mt-3'>Data submitted successfully!</Alert>}
 
@@ -243,6 +265,6 @@ export default function Home() {
           </Form>
         </Col>
       </Row>
-    </Container>
+    </>
   )
 }

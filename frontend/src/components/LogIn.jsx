@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { Container, Row, Col, Form, Button, Alert } from 'react-bootstrap'
+import Header from './Header'
 
 export default function Login() {
   const initialState = {
@@ -68,6 +69,7 @@ export default function Login() {
 
   return (
     <Container className="mt-5">
+      <Header />
       <Row className="justify-content-center">
         <Col md={10}>
           <h2 className="text-center mb-4">Login</h2>
