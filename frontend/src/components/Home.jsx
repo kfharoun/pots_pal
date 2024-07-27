@@ -21,6 +21,7 @@ export default function Home() {
   const [selectedMood, setSelectedMood] = useState(null)
   const [existingEntry, setExistingEntry] = useState(null)
   const [existingData, setExistingData] = useState(null)
+  const [waterIntake, setWaterIntake] = useState(0)
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(false)
   const formRef = useRef(null)
@@ -97,6 +98,14 @@ export default function Home() {
     }))
   }
 
+  // const handleIncrement = (incrementValue) => {
+  //   setWaterIntake(prevIntake => prevIntake + incrementValue)
+  // }
+
+  // const handleDecrement = (decrementValue) => {
+  //   setWaterIntake(prevIntake => Math.max(prevIntake - decrementValue, 0))
+  // }
+
   const handleIncrement = (field, increment) => {
     setFormData((prevFormData) => ({
       ...prevFormData,
@@ -110,7 +119,6 @@ export default function Home() {
       [field]: prevFormData[field] - decrement,
     }))
   }
-
   const handleMoodSelect = (mood) => {
     setSelectedMood(mood)
     setFormData((prevFormData) => ({
@@ -238,6 +246,7 @@ export default function Home() {
 
             <Form.Group controlId='water_intake' className='d-flex align-items-center'>
               <Form.Label className='mr-3'></Form.Label>
+              {/* <WaterIntake waterIntake={formData.water_intake} onIncrement={handleIncrement} onDecrement={handleDecrement} /> */}
               <WaterIntake
                 waterIntake={formData.water_intake}
                 onIncrement={() => handleIncrement('water_intake', 21)}
