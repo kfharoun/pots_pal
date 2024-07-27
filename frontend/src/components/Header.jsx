@@ -68,7 +68,7 @@ export default function Header({ onDateChange }) {
           {loggedIn ? (
             <>
               <Nav.Link onClick={handleLogout}>Logout</Nav.Link>
-              {(isCalendarPage || isHomePage) && (
+              {(isHomePage) && (
                 <Nav className="calendar">
                  <button height="10" onClick={handlePreviousDay}>
                   <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" className="bi bi-heart-arrow flipped-arrow" style={{ transform: 'scaleX(-1)' }} viewBox="0 0 16 16">

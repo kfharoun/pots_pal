@@ -14,7 +14,7 @@ const WaterIntake = ({ waterIntake, onIncrement, onDecrement }) => {
     </svg>
   )
 
-  const waterUnits = Math.floor(waterIntake / 21)
+  const waterUnits = Math.ceil(waterIntake / 21)
 
   const handleClick = (index) => {
     if (index < waterUnits) {
