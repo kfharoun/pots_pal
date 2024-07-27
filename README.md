@@ -31,7 +31,23 @@
 
 * chatgpt
     * helped learn django error coding formats
+    * helped with formatting calendar page logic
 
 * [learning about backend data rendering costs](https://community.weweb.io/t/fetching-data-and-filtering-best-practices/1001/12)
 
 * [troubleshooting date-fns](https://stackoverflow.com/questions/63161711/react-native-and-date-fns-problem-with-inserting-current-date)
+
+* [location path name](https://www.w3schools.com/jsref/prop_loc_pathname.asp)
+
+* [django filtering using 2 models](https://stackoverflow.com/questions/75392654/django-filter-using-q-objects-on-two-models)
+
+* [more on django Q](https://stackoverflow.com/questions/34115148/django-filtering-from-models-model-objects-filterq)
+
+* [viewset vs apiview](https://medium.com/@mathur.danduprolu/apiview-vsviewset-in-django-rest-framework-aa9a77921d53)
+    * "Standard CRUD Operations: If your API follows standard CRUD operations and you want to minimize boilerplate code, ViewSet is a more efficient choice. It leverages DRF's built-in functionality to handle common actions, making your codebase more maintainable."
+
+* [meta options](https://docs.djangoproject.com/en/5.0/ref/models/options/)
+
+* [django counter](https://stackoverflow.com/questions/3606416/django-most-efficient-way-to-count-same-field-values-in-a-query)
+
+*[getting info for day of and day before](https://www.geeksforgeeks.org/python-datetime-timedelta-function/)

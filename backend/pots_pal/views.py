@@ -1,6 +1,10 @@
 import os
 import requests
 from django.http import JsonResponse
+from django.db.models import Q 
+from collections import defaultdict, Counter
+from datetime import timedelta
+from rest_framework.views import APIView
 from rest_framework import status, viewsets, generics
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
@@ -244,6 +248,98 @@ class DataUpdateByUsernameView(generics.RetrieveUpdateAPIView):
         day = get_object_or_404(Day, id=day_id, user=user)
         serializer.save(day=day)
 
+class AggregateDataByMoodView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, username, mood):
+        user = get_object_or_404(CustomUser, username=username)
+
+        if mood == 'good_day':
+            days = Day.objects.filter(user=user, good_day=True)
+        elif mood == 'neutral_day':
+            days = Day.objects.filter(user=user, neutral_day=True)
+        elif mood == 'bad_day':
+            days = Day.objects.filter(user=user).filter(
+                Q(nauseous=True) | Q(fainting=True) | Q(bed_bound=True)
+            )
+        else:
+            return Response({'detail': 'Invalid mood'}, status=status.HTTP_400_BAD_REQUEST)
+
+        day_ids = days.values_list('id', flat=True)
+        day_dates = days.values_list('date', flat=True)
+
+        # Get days before
+        days_before = Day.objects.filter(user=user, date__in=[date - timedelta(days=1) for date in day_dates])
+
+        data = Data.objects.filter(day__in=days)
+        data_before = Data.objects.filter(day__in=days_before)
+
+        def round_to_nearest_5(value):
+            return 5 * round(value / 5)
+
+        def aggregate_data(data_set):
+            result = {
+                'meal_items': Counter(),
+                'activity_items': Counter(),
+                'water_intake': 0,
+                'salt_intake': 0,
+                'weather': Counter(),
+                'low_heart_rate': Counter(),
+                'high_heart_rate': Counter(),
+                'count': len(data_set),
+            }
+            weather_values = defaultdict(list)
+            low_heart_rate_values = defaultdict(list)
+            high_heart_rate_values = defaultdict(list)
+
+            for entry in data_set:
+                result['meal_items'].update(entry.meal_item)
+                result['activity_items'].update(entry.activity_item)
+                result['water_intake'] += entry.water_intake
+                result['salt_intake'] += entry.salt_intake
+
+                rounded_weather = round_to_nearest_5(entry.weather)
+                weather_values[rounded_weather].append(entry.weather)
+
+                rounded_low_hr = round_to_nearest_5(entry.low_heart_rate)
+                low_heart_rate_values[rounded_low_hr].append(entry.low_heart_rate)
+
+                rounded_high_hr = round_to_nearest_5(entry.high_heart_rate)
+                high_heart_rate_values[rounded_high_hr].append(entry.high_heart_rate)
+
+            if result['count'] > 0:
+                result['water_intake'] /= result['count']
+                result['salt_intake'] /= result['count']
+
+            # Calculate average for weather and heart rate
+            for key, values in weather_values.items():
+                avg_weather = sum(values) / len(values)
+                result['weather'][key] = avg_weather
+
+            for key, values in low_heart_rate_values.items():
+                avg_low_hr = sum(values) / len(values)
+                result['low_heart_rate'][key] = avg_low_hr
+
+            for key, values in high_heart_rate_values.items():
+                avg_high_hr = sum(values) / len(values)
+                result['high_heart_rate'][key] = avg_high_hr
+
+            # Filter items that appear three or more times
+            result['meal_items'] = {k: v for k, v in result['meal_items'].items() if v >= 3}
+            result['activity_items'] = {k: v for k, v in result['activity_items'].items() if v >= 3}
+            result['weather'] = {k: v for k, v in result['weather'].items() if len(weather_values[k]) >= 3}
+            result['low_heart_rate'] = {k: v for k, v in result['low_heart_rate'].items() if len(low_heart_rate_values[k]) >= 3}
+            result['high_heart_rate'] = {k: v for k, v in result['high_heart_rate'].items() if len(high_heart_rate_values[k]) >= 3}
+
+            return result
+
+        aggregated_data = {
+            'total_entries': data.count(),
+            'current_day': aggregate_data(data),
+            'day_before': aggregate_data(data_before)
+        }
+
+        return Response(aggregated_data)
 import requests
 from django.http import JsonResponse
 from rest_framework.decorators import api_view
