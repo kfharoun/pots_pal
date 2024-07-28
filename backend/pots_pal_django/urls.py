@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path
 from pots_pal.views import (
     ListDay, DayDetail, ListData, DataDetail, UserList, UserDetail,
-    FavoriteList, FavoriteDetail, CustomTokenObtainPairView, GetUserByUsernameView, DataByUsernameView, DaysByUsernameView, signup, DayUpdateByUsernameView, DataUpdateByUsernameView, DayByUsernameDateView, AggregateDataByMoodView
+    FavoriteList, FavoriteDetail, CustomTokenObtainPairView, GetUserByUsernameView, DataByUsernameView, DaysByUsernameView, signup, DayUpdateByUsernameView, DataUpdateByUsernameView, DayByUsernameDateView, AggregateDataByMoodView, FavoriteMealItemView, DailyLogView, FavoriteActivityItemView, FavoriteItemView
 )
 from rest_framework_simplejwt.views import TokenRefreshView
 
@@ -26,13 +26,17 @@ urlpatterns = [
     path('users/<int:pk>/', UserDetail.as_view(), name='user-detail'),
     path('users/<str:username>/', GetUserByUsernameView.as_view()),
 
-    path('favs/', FavoriteList.as_view(), name='favorite-list'),
-    path('favs/<int:pk>/', FavoriteDetail.as_view(), name='favorite-detail'),
+  
 
     path('api/token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/signup', signup),
 
     path('days/<str:username>/aggregate/<str:mood>/', AggregateDataByMoodView.as_view(), name='aggregate-data-by-mood'),
-
+    path('data/<str:username>/today/', DailyLogView.as_view(), name='daily-log'),
+    path('favorites/meal/<str:username>/', FavoriteMealItemView.as_view(), name='favorite-meal'),
+    path('favorites/activity/<str:username>/', FavoriteActivityItemView.as_view(), name='favorite-activity'),
+    path('favorites/<str:username>/', FavoriteItemView.as_view(), name='favorite-item-detail'),
+    path('favs/', FavoriteList.as_view(), name='favorite-list'),
+    path('favs/<int:pk>/', FavoriteDetail.as_view(), name='favorite-detail'),
 ]

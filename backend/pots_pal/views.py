@@ -6,6 +6,7 @@ from collections import defaultdict, Counter
 from datetime import timedelta
 from rest_framework.views import APIView
 from rest_framework import status, viewsets, generics
+from django.utils import timezone
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from django.shortcuts import get_object_or_404
@@ -265,10 +266,7 @@ class AggregateDataByMoodView(APIView):
         else:
             return Response({'detail': 'Invalid mood'}, status=status.HTTP_400_BAD_REQUEST)
 
-        day_ids = days.values_list('id', flat=True)
         day_dates = days.values_list('date', flat=True)
-
-        # Get days before
         days_before = Day.objects.filter(user=user, date__in=[date - timedelta(days=1) for date in day_dates])
 
         data = Data.objects.filter(day__in=days)
@@ -285,8 +283,7 @@ class AggregateDataByMoodView(APIView):
                 'salt_intake': 0,
                 'weather': Counter(),
                 'low_heart_rate': Counter(),
-                'high_heart_rate': Counter(),
-                'count': len(data_set),
+                'high_heart_rate': Counter()
             }
             weather_values = defaultdict(list)
             low_heart_rate_values = defaultdict(list)
@@ -307,11 +304,6 @@ class AggregateDataByMoodView(APIView):
                 rounded_high_hr = round_to_nearest_5(entry.high_heart_rate)
                 high_heart_rate_values[rounded_high_hr].append(entry.high_heart_rate)
 
-            if result['count'] > 0:
-                result['water_intake'] /= result['count']
-                result['salt_intake'] /= result['count']
-
-            # Calculate average for weather and heart rate
             for key, values in weather_values.items():
                 avg_weather = sum(values) / len(values)
                 result['weather'][key] = avg_weather
@@ -324,7 +316,6 @@ class AggregateDataByMoodView(APIView):
                 avg_high_hr = sum(values) / len(values)
                 result['high_heart_rate'][key] = avg_high_hr
 
-            # Filter items that appear three or more times
             result['meal_items'] = {k: v for k, v in result['meal_items'].items() if v >= 3}
             result['activity_items'] = {k: v for k, v in result['activity_items'].items() if v >= 3}
             result['weather'] = {k: v for k, v in result['weather'].items() if len(weather_values[k]) >= 3}
@@ -340,6 +331,219 @@ class AggregateDataByMoodView(APIView):
         }
 
         return Response(aggregated_data)
+    
+class DailyLogView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, username):
+        user = get_object_or_404(CustomUser, username=username)
+        date_today = timezone.now().date()
+        day = Day.objects.filter(user=user, date=date_today).first()
+        if not day:
+            return Response({"detail": "No log for today"}, status=status.HTTP_404_NOT_FOUND)
+        
+        data = Data.objects.filter(day=day).first()
+        if not data:
+            return Response({"detail": "No data for today"}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = DataSerializer(data)
+        return Response(serializer.data)
+
+    def post(self, request, username):
+        user = get_object_or_404(CustomUser, username=username)
+        date_today = timezone.now().date()
+        day, created = Day.objects.get_or_create(user=user, date=date_today)
+
+        data = Data.objects.filter(day=day).first()
+        if data:
+            serializer = DataSerializer(data, data=request.data, partial=True)
+        else:
+            serializer = DataSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            serializer.save(day=day)
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class FavoriteMealItemView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, username):
+        user = get_object_or_404(CustomUser, username=username)
+        favorites = Favorite.objects.filter(user=user, food_items__isnull=False)
+        serializer = FavoriteSerializer(favorites, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, username):
+        user = get_object_or_404(CustomUser, username=username)
+        item = request.data.get('item')
+        if not item:
+            return Response({"detail": "Item is required"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if Favorite.objects.filter(user=user, food_items=item).exists():
+            return Response({"detail": "Already in favorites"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        Favorite.objects.create(user=user, food_items=item)
+        return Response({"detail": "Added to favorites"}, status=status.HTTP_201_CREATED)
+
+    def put(self, request, username):
+        user = get_object_or_404(CustomUser, username=username)
+        favorite_id = request.data.get('id')
+        item = request.data.get('item')
+        if not favorite_id or not item:
+            return Response({"detail": "Favorite ID and item are required"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        favorite = get_object_or_404(Favorite, id=favorite_id, user=user)
+        favorite.food_items = item
+        favorite.save()
+        
+        return Response({"detail": "Favorite updated"}, status=status.HTTP_200_OK)
+
+    def patch(self, request, username):
+        user = get_object_or_404(CustomUser, username=username)
+        favorite_id = request.data.get('id')
+        item = request.data.get('item')
+        if not favorite_id:
+            return Response({"detail": "Favorite ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        favorite = get_object_or_404(Favorite, id=favorite_id, user=user)
+        if item:
+            favorite.food_items = item
+        favorite.save()
+        
+        return Response({"detail": "Favorite partially updated"}, status=status.HTTP_200_OK)
+
+    def delete(self, request, username, pk):
+        user = get_object_or_404(CustomUser, username=username)
+        favorite = get_object_or_404(Favorite, id=pk, user=user)
+        favorite.delete()
+        return Response({"detail": "Favorite removed"}, status=status.HTTP_204_NO_CONTENT)
+    
+class FavoriteActivityItemView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, username):
+        user = get_object_or_404(CustomUser, username=username)
+        favorites = Favorite.objects.filter(user=user, activity_items__isnull=False)
+        serializer = FavoriteSerializer(favorites, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, username):
+        user = get_object_or_404(CustomUser, username=username)
+        item = request.data.get('item')
+        if not item:
+            return Response({"detail": "Item is required"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if Favorite.objects.filter(user=user, activity_items=item).exists():
+            return Response({"detail": "Already in favorites"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        Favorite.objects.create(user=user, activity_items=item)
+        return Response({"detail": "Added to favorites"}, status=status.HTTP_201_CREATED)
+
+    def put(self, request, username):
+        user = get_object_or_404(CustomUser, username=username)
+        favorite_id = request.data.get('id')
+        item = request.data.get('item')
+        if not favorite_id or not item:
+            return Response({"detail": "Favorite ID and item are required"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        favorite = get_object_or_404(Favorite, id=favorite_id, user=user)
+        favorite.activity_items = item
+        favorite.save()
+        
+        return Response({"detail": "Favorite updated"}, status=status.HTTP_200_OK)
+
+    def patch(self, request, username):
+        user = get_object_or_404(CustomUser, username=username)
+        favorite_id = request.data.get('id')
+        item = request.data.get('item')
+        if not favorite_id:
+            return Response({"detail": "Favorite ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        favorite = get_object_or_404(Favorite, id=favorite_id, user=user)
+        if item:
+            favorite.activity_items = item
+        favorite.save()
+        
+        return Response({"detail": "Favorite partially updated"}, status=status.HTTP_200_OK)
+
+    def delete(self, request, username, pk):
+        user = get_object_or_404(CustomUser, username=username)
+        favorite = get_object_or_404(Favorite, id=pk, user=user)
+        favorite.delete()
+        return Response({"detail": "Favorite removed"}, status=status.HTTP_204_NO_CONTENT)
+    
+class FavoriteItemView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, username):
+        user = get_object_or_404(CustomUser, username=username)
+        favorites_food = Favorite.objects.filter(user=user, food_items__isnull=False)
+        favorites_activity = Favorite.objects.filter(user=user, activity_items__isnull=False)
+        
+        response_data = {
+            'food_items': FavoriteSerializer(favorites_food, many=True).data,
+            'activity_items': FavoriteSerializer(favorites_activity, many=True).data,
+        }
+        
+        return Response(response_data)
+
+    def post(self, request, username):
+        user = get_object_or_404(CustomUser, username=username)
+        food_item = request.data.get('food_item')
+        activity_item = request.data.get('activity_item')
+        
+        if not food_item and not activity_item:
+            return Response({"detail": "Food item or activity item is required"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if food_item:
+            if Favorite.objects.filter(user=user, food_items=food_item).exists():
+                return Response({"detail": "Already in favorites"}, status=status.HTTP_400_BAD_REQUEST)
+            Favorite.objects.create(user=user, food_items=food_item)
+        
+        if activity_item:
+            if Favorite.objects.filter(user=user, activity_items=activity_item).exists():
+                return Response({"detail": "Already in favorites"}, status=status.HTTP_400_BAD_REQUEST)
+            Favorite.objects.create(user=user, activity_items=activity_item)
+        
+        return Response({"detail": "Added to favorites"}, status=status.HTTP_201_CREATED)
+
+    def put(self, request, username):
+        user = get_object_or_404(CustomUser, username=username)
+        favorite_id = request.data.get('id')
+        food_item = request.data.get('food_item')
+        activity_item = request.data.get('activity_item')
+        
+        if not favorite_id or (not food_item and not activity_item):
+            return Response({"detail": "Favorite ID and item are required"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        favorite = get_object_or_404(Favorite, id=favorite_id, user=user)
+        if food_item:
+            favorite.food_items = food_item
+        if activity_item:
+            favorite.activity_items = activity_item
+        favorite.save()
+        
+        return Response({"detail": "Favorite updated"}, status=status.HTTP_200_OK)
+
+    def patch(self, request, username):
+        user = get_object_or_404(CustomUser, username=username)
+        favorite_id = request.data.get('id')
+        food_item = request.data.get('food_item')
+        activity_item = request.data.get('activity_item')
+        
+        if not favorite_id:
+            return Response({"detail": "Favorite ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        favorite = get_object_or_404(Favorite, id=favorite_id, user=user)
+        if food_item:
+            favorite.food_items = food_item
+        if activity_item:
+            favorite.activity_items = activity_item
+        favorite.save()
+        
+        return Response({"detail": "Favorite partially updated"}, status=status.HTTP_200_OK)
+    
 import requests
 from django.http import JsonResponse
 from rest_framework.decorators import api_view
