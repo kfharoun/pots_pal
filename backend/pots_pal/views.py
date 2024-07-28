@@ -3,7 +3,7 @@ import requests
 from django.http import JsonResponse
 from django.db.models import Q 
 from collections import defaultdict, Counter
-from datetime import timedelta
+from datetime import timedelta, datetime
 from rest_framework.views import APIView
 from rest_framework import status, viewsets, generics
 from django.utils import timezone
@@ -332,145 +332,126 @@ class AggregateDataByMoodView(APIView):
 
         return Response(aggregated_data)
     
-class DailyLogView(APIView):
+class DataByDateView(APIView):
     permission_classes = [AllowAny]
 
-    def get(self, request, username):
+    def get(self, request, username, date):
         user = get_object_or_404(CustomUser, username=username)
-        date_today = timezone.now().date()
-        day = Day.objects.filter(user=user, date=date_today).first()
-        if not day:
-            return Response({"detail": "No log for today"}, status=status.HTTP_404_NOT_FOUND)
-        
-        data = Data.objects.filter(day=day).first()
+        date_obj = datetime.strptime(date, '%Y-%m-%d').date()
+        data = Data.objects.filter(day__user=user, day__date=date_obj).first()
         if not data:
-            return Response({"detail": "No data for today"}, status=status.HTTP_404_NOT_FOUND)
-        
+            return Response({"detail": "Data not found"}, status=status.HTTP_404_NOT_FOUND)
         serializer = DataSerializer(data)
         return Response(serializer.data)
-
-    def post(self, request, username):
-        user = get_object_or_404(CustomUser, username=username)
-        date_today = timezone.now().date()
-        day, created = Day.objects.get_or_create(user=user, date=date_today)
-
-        data = Data.objects.filter(day=day).first()
-        if data:
-            serializer = DataSerializer(data, data=request.data, partial=True)
-        else:
-            serializer = DataSerializer(data=request.data)
-        
-        if serializer.is_valid():
-            serializer.save(day=day)
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 class FavoriteMealItemView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, username):
         user = get_object_or_404(CustomUser, username=username)
-        favorites = Favorite.objects.filter(user=user, food_items__isnull=False)
-        serializer = FavoriteSerializer(favorites, many=True)
-        return Response(serializer.data)
+        favorites = Favorite.objects.filter(user=user).values('food_items')
+        return Response({"food_items": favorites[0]["food_items"] if favorites else []})
 
     def post(self, request, username):
         user = get_object_or_404(CustomUser, username=username)
         item = request.data.get('item')
         if not item:
             return Response({"detail": "Item is required"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        if Favorite.objects.filter(user=user, food_items=item).exists():
-            return Response({"detail": "Already in favorites"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        Favorite.objects.create(user=user, food_items=item)
+
+        favorite = Favorite.objects.filter(user=user).first()
+        if not favorite:
+            favorite = Favorite(user=user, food_items=[item])
+        else:
+            if item in favorite.food_items:
+                return Response({"detail": "Already in favorites"}, status=status.HTTP_400_BAD_REQUEST)
+            favorite.food_items.append(item)
+        favorite.save()
         return Response({"detail": "Added to favorites"}, status=status.HTTP_201_CREATED)
 
     def put(self, request, username):
         user = get_object_or_404(CustomUser, username=username)
-        favorite_id = request.data.get('id')
         item = request.data.get('item')
-        if not favorite_id or not item:
-            return Response({"detail": "Favorite ID and item are required"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        favorite = get_object_or_404(Favorite, id=favorite_id, user=user)
-        favorite.food_items = item
+        if not item:
+            return Response({"detail": "Item is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        favorite = get_object_or_404(Favorite, user=user)
+        if item not in favorite.food_items:
+            favorite.food_items.append(item)
         favorite.save()
-        
         return Response({"detail": "Favorite updated"}, status=status.HTTP_200_OK)
 
     def patch(self, request, username):
         user = get_object_or_404(CustomUser, username=username)
-        favorite_id = request.data.get('id')
         item = request.data.get('item')
-        if not favorite_id:
-            return Response({"detail": "Favorite ID is required"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        favorite = get_object_or_404(Favorite, id=favorite_id, user=user)
-        if item:
-            favorite.food_items = item
+        if not item:
+            return Response({"detail": "Item is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        favorite = get_object_or_404(Favorite, user=user)
+        if item not in favorite.food_items:
+            favorite.food_items.append(item)
         favorite.save()
-        
         return Response({"detail": "Favorite partially updated"}, status=status.HTTP_200_OK)
 
     def delete(self, request, username, pk):
         user = get_object_or_404(CustomUser, username=username)
         favorite = get_object_or_404(Favorite, id=pk, user=user)
-        favorite.delete()
+        favorite.food_items.remove(pk)
+        favorite.save()
         return Response({"detail": "Favorite removed"}, status=status.HTTP_204_NO_CONTENT)
-    
+
+
 class FavoriteActivityItemView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, username):
         user = get_object_or_404(CustomUser, username=username)
-        favorites = Favorite.objects.filter(user=user, activity_items__isnull=False)
-        serializer = FavoriteSerializer(favorites, many=True)
-        return Response(serializer.data)
+        favorites = Favorite.objects.filter(user=user).values('activity_items')
+        return Response({"activity_items": favorites[0]["activity_items"] if favorites else []})
 
     def post(self, request, username):
         user = get_object_or_404(CustomUser, username=username)
         item = request.data.get('item')
         if not item:
             return Response({"detail": "Item is required"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        if Favorite.objects.filter(user=user, activity_items=item).exists():
-            return Response({"detail": "Already in favorites"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        Favorite.objects.create(user=user, activity_items=item)
+
+        favorite = Favorite.objects.filter(user=user).first()
+        if not favorite:
+            favorite = Favorite(user=user, activity_items=[item])
+        else:
+            if item in favorite.activity_items:
+                return Response({"detail": "Already in favorites"}, status=status.HTTP_400_BAD_REQUEST)
+            favorite.activity_items.append(item)
+        favorite.save()
         return Response({"detail": "Added to favorites"}, status=status.HTTP_201_CREATED)
 
     def put(self, request, username):
         user = get_object_or_404(CustomUser, username=username)
-        favorite_id = request.data.get('id')
         item = request.data.get('item')
-        if not favorite_id or not item:
-            return Response({"detail": "Favorite ID and item are required"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        favorite = get_object_or_404(Favorite, id=favorite_id, user=user)
-        favorite.activity_items = item
+        if not item:
+            return Response({"detail": "Item is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        favorite = get_object_or_404(Favorite, user=user)
+        if item not in favorite.activity_items:
+            favorite.activity_items.append(item)
         favorite.save()
-        
         return Response({"detail": "Favorite updated"}, status=status.HTTP_200_OK)
 
     def patch(self, request, username):
         user = get_object_or_404(CustomUser, username=username)
-        favorite_id = request.data.get('id')
         item = request.data.get('item')
-        if not favorite_id:
-            return Response({"detail": "Favorite ID is required"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        favorite = get_object_or_404(Favorite, id=favorite_id, user=user)
-        if item:
-            favorite.activity_items = item
+        if not item:
+            return Response({"detail": "Item is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        favorite = get_object_or_404(Favorite, user=user)
+        if item not in favorite.activity_items:
+            favorite.activity_items.append(item)
         favorite.save()
-        
         return Response({"detail": "Favorite partially updated"}, status=status.HTTP_200_OK)
 
     def delete(self, request, username, pk):
         user = get_object_or_404(CustomUser, username=username)
         favorite = get_object_or_404(Favorite, id=pk, user=user)
-        favorite.delete()
+        favorite.activity_items.remove(pk)
+        favorite.save()
         return Response({"detail": "Favorite removed"}, status=status.HTTP_204_NO_CONTENT)
     
 class FavoriteItemView(APIView):
