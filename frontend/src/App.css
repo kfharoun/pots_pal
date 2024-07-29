@@ -10,17 +10,79 @@
 .Header {
   position: absolute;
   top: 0;
-  margin-top: 5em;
+  margin-top: 2.5em;
+  display: flex;
+  justify-content: space-around;
 }
 
+.nav-stuff {
+  margin-right: 1em;
+  display: flex;
+  justify-content: space-between;
+}
+
+.calendar.navbar-nav {
+  display: flex;
+  justify-content: space-between;
+  padding-right: 50px;
+  padding-left: 50px;
+  font-weight: 600;
+}
 .log {
   margin-top: 48em;
   margin-left: 5em;
 }
 
+.datecal { 
+  font-size: 16px;
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-top: 5px;
+}
+
+.bi-heart-arrow {
+  margin-top: 8px;
+}
+
 .login-text{
   font-size: 20px;
 }
+
+.navbar-custom {
+  display: flex;
+  justify-content: center;
+}
+
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+}
+
+.nav-item-container {
+  display: flex;
+  justify-content: space-evenly;
+  margin-left: -10px;
+  flex-grow: 1;
+}
+
+.nav-item {
+  margin: 0 10px; 
+}
+
+.calendar-nav {
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+}
+
+.arrow {
+  cursor: pointer;
+  margin: 0 5px; 
+}
+
+
 /* calendar page */
 .calendar-page {
   padding: 20px;
@@ -58,12 +120,14 @@
 }
 
 
+
 /* home */
 
 .HomeWelcome{
   font-size: 20px;
   margin-top: 2em;
-  margin-bottom: -10px;
+  margin-bottom: -20px;
+  font-weight: 700;
 }
 
 .mood-check{
@@ -95,10 +159,11 @@
 .disclaimer {
   margin-top: 1em;
   font-style: italic;
+  font-weight: 200;
 }
 
 .daily-log {
-  margin-bottom: 3em;
+  margin-bottom: -1em;
 }
 
 .update-button{

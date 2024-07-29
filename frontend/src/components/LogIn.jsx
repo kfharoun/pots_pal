@@ -73,12 +73,17 @@ export default function Login() {
     })
   }
 
+  
+
   return (
+    <div className='Login'>
+      <h2 className="text-center mb-4 login-text">ready to spot the patterns?</h2>
+      <h2 className='login-emoji'>✨</h2>
     <Container className="mt-5">
       <Header />
       <Row className="justify-content-center">
         <Col md={10}>
-          <h2 className="text-center mb-4">Login</h2>
+          
           <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3">
               <Form.Label>Username</Form.Label>
@@ -102,12 +107,13 @@ export default function Login() {
             </Form.Group>
             <div className='button-container-1'>
             <span class="mas">login</span>
-            <button variant="primary" type="submit" className="w-100" id='work' ref={buttonRef}>login</button>
+            <button ref={buttonRef} variant="primary" type="submit" className="w-100" id='work'>login</button>
             </div>
             {formState.error && <Alert variant="danger" className="mt-3">{formState.error}</Alert>}
           </Form>
         </Col>
       </Row>
     </Container>
+    </div>
   )
 }

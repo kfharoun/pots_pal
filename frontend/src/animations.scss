@@ -47,7 +47,7 @@ $col) {
     overflow: hidden;
     // border: 1px solid;
     // font-weight: 300;
-    font-size: 14px;
+    font-size: 13px;
     transition: 0.5s;
     letter-spacing: 1px;
      border-radius: 7px;
@@ -55,9 +55,9 @@ $col) {
   button {
     width: 101%;
     height: 100%;
-    // font-weight: 300; 
-    font-size: 11px;
-    letter-spacing: 1px;
+    font-weight: bold; 
+    font-size: 13px;
+    font-style: italic;
     color: #223863;
 
     @include button(#223863,
@@ -89,5 +89,5 @@ $col) {
 	overflow: hidden;
     width: 90px;
     height: 40px;
-    font-size: 11px;
+    font-size: 13px;
 }

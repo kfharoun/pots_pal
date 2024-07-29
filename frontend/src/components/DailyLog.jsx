@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import { useParams, useLocation, useNavigate } from 'react-router-dom'
-import { Button, Alert } from 'react-bootstrap'
+import { Button, Alert, Form } from 'react-bootstrap'
 import Header from './Header'
 
 const DailyLog = () => {
@@ -75,64 +75,66 @@ const DailyLog = () => {
   )
 
   const renderForm = () => (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label>High Heart Rate</label>
-        <input
+    <Form onSubmit={handleSubmit}>
+      <Form.Group controlId="formHighHeartRate">
+        <Form.Label>High Heart Rate</Form.Label>
+        <Form.Control
           type="text"
           name="high_heart_rate"
           value={logData.high_heart_rate}
           onChange={(e) => handleChange(e, null, null)}
         />
-      </div>
-      <div>
-        <label>Low Heart Rate</label>
-        <input
+      </Form.Group>
+      <Form.Group controlId="formLowHeartRate">
+        <Form.Label>Low Heart Rate</Form.Label>
+        <Form.Control
           type="text"
           name="low_heart_rate"
           value={logData.low_heart_rate}
           onChange={(e) => handleChange(e, null, null)}
         />
-      </div>
-      <div>
-        <label>Weather</label>
-        <input
+      </Form.Group>
+      <Form.Group controlId="formWeather">
+        <Form.Label>Weather</Form.Label>
+        <Form.Control
           type="text"
           name="weather"
           value={logData.weather}
           onChange={(e) => handleChange(e, null, null)}
         />
-      </div>
-      <div>
-        <label>Food Items</label>
+      </Form.Group>
+      <Form.Group>
+        <Form.Label>Food Items</Form.Label>
         {logData.meal_item.map((item, index) => (
-          <div key={index}>
-            <input
+          <div key={index} className="d-flex align-items-center mb-2">
+            <Form.Control
               type="text"
               value={item}
               onChange={(e) => handleChange(e, index, 'meal')}
+              className="me-2"
             />
             <Button variant="danger" onClick={() => handleRemoveInput(index, 'meal')}>Remove</Button>
           </div>
         ))}
         <Button variant="primary" onClick={() => handleAddInput('meal')}>Add Food Item</Button>
-      </div>
-      <div>
-        <label>Activity Items</label>
+      </Form.Group>
+      <Form.Group>
+        <Form.Label>Activity Items</Form.Label>
         {logData.activity_item.map((item, index) => (
-          <div key={index}>
-            <input
+          <div key={index} className="d-flex align-items-center mb-2">
+            <Form.Control
               type="text"
               value={item}
               onChange={(e) => handleChange(e, index, 'activity')}
+              className="me-2"
             />
             <Button variant="danger" onClick={() => handleRemoveInput(index, 'activity')}>Remove</Button>
           </div>
         ))}
         <Button variant="primary" onClick={() => handleAddInput('activity')}>Add Activity Item</Button>
-      </div>
-      <button type="submit">Submit Log</button>
-    </form>
+      </Form.Group>
+      <Button type="submit" variant="primary">Submit Log</Button>
+    </Form>
   )
 
   const handleChange = (e, index, type) => {
@@ -211,7 +213,7 @@ const DailyLog = () => {
     <>
       <Header />
       <div className='container mt-4'>
-        <h1>log</h1>
+        <h1>Log</h1>
         {error && <Alert variant='danger' className='mt-3'>{error}</Alert>}
         {success && <Alert variant='success' className='mt-3'>Data submitted successfully!</Alert>}
         {isEditing ? renderForm() : renderLogData()}

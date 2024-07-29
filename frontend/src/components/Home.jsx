@@ -26,6 +26,7 @@ export default function Home() {
   const [success, setSuccess] = useState(false)
   const formRef = useRef(null)
   const buttonRef = useRef(null)
+  const dailyLogButtonRef = useRef(null)
   const [currentDate, setCurrentDate] = useState(new Date().toISOString().split('T')[0])
 
   useEffect(() => {
@@ -130,7 +131,6 @@ export default function Home() {
     if (buttonRef.current) {
       buttonRef.current.classList.add('active')
     }
-
     setTimeout(async () => {
       const dayData = {
         user: username,
@@ -270,14 +270,14 @@ export default function Home() {
             {success && <Alert variant='success' className='mt-3'>Data submitted successfully!</Alert>} */}
             <div className=' update-button button-container-1'>
               <span className='mas'>
-                {existingEntry ? 'Update' : 'Submit'}
+                {existingEntry ? 'update' : 'submit'}
               </span>
               <button
                 type='submit'
                 ref={buttonRef}
                 id='submit-button'
               >
-                {existingEntry ? 'Update' : 'Submit'}
+                {existingEntry ? 'update' : 'submit'}
               </button>
             </div>
           </Form>

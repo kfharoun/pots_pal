@@ -44,7 +44,7 @@ button {
   border-radius: 8px;
   border: 1px solid transparent;
   padding: 0.6em 1.2em;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 500;
   font-family: inherit;
   background-color: #223863;
@@ -61,7 +61,7 @@ button:focus-visible {
 }
 
 .update-button{
-  margin-top: 2vh;
+  margin-top: 4vh;
 }
 
 .form-control,
