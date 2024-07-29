@@ -17,6 +17,7 @@ const SaltIntake = ({ saltIntake, onIncrement, onDecrement }) => {
         height="auto"
         style={{ cursor: 'pointer' }}
         onClick={() => i < saltUnits ? onDecrement() : onIncrement()}
+        className='salt-pic'
       />
     )
   }

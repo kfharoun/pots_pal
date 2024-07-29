@@ -20,6 +20,7 @@ const MoodSelector = ({ selectedMood, onSelectMood }) => {
           height="auto"
           style={{ cursor: 'pointer' }}
           onClick={() => onSelectMood(mood.id)}
+          className='mood-pic'
         />
       ))}
     </div>

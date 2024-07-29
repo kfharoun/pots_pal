@@ -25,6 +25,7 @@ export default function Home() {
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(false)
   const formRef = useRef(null)
+  const buttonRef = useRef(null)
   const [currentDate, setCurrentDate] = useState(new Date().toISOString().split('T')[0])
 
   useEffect(() => {
@@ -98,14 +99,6 @@ export default function Home() {
     }))
   }
 
-  // const handleIncrement = (incrementValue) => {
-  //   setWaterIntake(prevIntake => prevIntake + incrementValue)
-  // }
-
-  // const handleDecrement = (decrementValue) => {
-  //   setWaterIntake(prevIntake => Math.max(prevIntake - decrementValue, 0))
-  // }
-
   const handleIncrement = (field, increment) => {
     setFormData((prevFormData) => ({
       ...prevFormData,
@@ -119,6 +112,7 @@ export default function Home() {
       [field]: prevFormData[field] - decrement,
     }))
   }
+
   const handleMoodSelect = (mood) => {
     setSelectedMood(mood)
     setFormData((prevFormData) => ({
@@ -133,59 +127,80 @@ export default function Home() {
 
   const handleFormSubmit = (e) => {
     e.preventDefault()
-    formRef.current.submit()
-  }
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-
-    const dayData = {
-      user: username,
-      good_day: formData.good_day,
-      neutral_day: formData.neutral_day,
-      nauseous: formData.nauseous,
-      fainting: formData.fainting,
-      bed_bound: formData.bed_bound,
+    if (buttonRef.current) {
+      buttonRef.current.classList.add('active')
     }
 
-    const dataData = {
-      water_intake: formData.water_intake,
-      salt_intake: formData.salt_intake,
-      meal_item: [],
-      activity_item: []
-    }
+    setTimeout(async () => {
+      const dayData = {
+        user: username,
+        good_day: formData.good_day,
+        neutral_day: formData.neutral_day,
+        nauseous: formData.nauseous,
+        fainting: formData.fainting,
+        bed_bound: formData.bed_bound,
+      }
 
-    try {
-      if (existingEntry) {
-        // Update existing day without sending the date
-        await axios.patch(
-          `http://localhost:8000/days/${username}/${existingEntry.id}/`,
-          dayData,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          }
-        )
+      const dataData = {
+        water_intake: formData.water_intake,
+        salt_intake: formData.salt_intake,
+        meal_item: [],
+        activity_item: []
+      }
 
-        // Check if there is existing data for the day
-        if
-        (existingData) {
-          // Update existing data with PATCH
+      try {
+        if (existingEntry) {
+          // Update existing day without sending the date
           await axios.patch(
-            `http://localhost:8000/data/${existingData.id}/`,
-            dataData,
+            `http://localhost:8000/days/${username}/${existingEntry.id}/`,
+            dayData,
             {
               headers: {
                 'Content-Type': 'application/json',
               },
             }
           )
+
+          // Check if there is existing data for the day
+          if (existingData) {
+            // Update existing data with PATCH
+            await axios.patch(
+              `http://localhost:8000/data/${existingData.id}/`,
+              dataData,
+              {
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+              }
+            )
+          } else {
+            // Create new data entry
+            await axios.post(
+              `http://localhost:8000/data/`,
+              { ...dataData, day: existingEntry.id },
+              {
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+              }
+            )
+          }
         } else {
+          // Create new day entry including the date
+          const dayResponse = await axios.post(
+            `http://localhost:8000/days/`,
+            { ...dayData, date: currentDate },
+            {
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            }
+          )
+          const dayId = dayResponse.data.id
           // Create new data entry
           await axios.post(
             `http://localhost:8000/data/`,
-            { ...dataData, day: existingEntry.id },
+            { ...dataData, day: dayId },
             {
               headers: {
                 'Content-Type': 'application/json',
@@ -193,37 +208,15 @@ export default function Home() {
             }
           )
         }
-      } else {
-        // Create new day entry including the date
-        const dayResponse = await axios.post(
-          `http://localhost:8000/days/`,
-          { ...dayData, date: currentDate },
-          {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          }
-        )
-        const dayId = dayResponse.data.id
-        // Create new data entry
-        await axios.post(
-          `http://localhost:8000/data/`,
-          { ...dataData, day: dayId },
-          {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          }
-        )
-      }
 
-      setSuccess(true)
-      setError(null)
-      window.location.reload()
-    } catch (err) {
-      setError(err.response ? err.response.data : 'Error submitting data')
-      setSuccess(false)
-    }
+        setSuccess(true)
+        setError(null)
+        window.location.reload()
+      } catch (err) {
+        setError(err.response ? err.response.data : 'Error submitting data')
+        setSuccess(false)
+      }
+    }, 700) // Delay to match animation duration
   }
 
   const handleDateChange = (newDate) => {
@@ -237,24 +230,31 @@ export default function Home() {
       <Row className='justify-content-center'>
         <Col md={10} className='text-center'>
           <h1 className='HomeWelcome'>✨ welcome back, {username} ✨</h1>
-          <Link to={`/log/${username}`}><button>daily log</button></Link>
+          <div className='button-container-1 daily-log'>
+            <span className='mas'>Daily Log</span>
+            <Link to={`/log/${username}`}>
+              <button ref={buttonRef} className='w-100' id='daily-log-button'>
+                daily log
+              </button>
+            </Link>
+          </div>
 
-          <Form ref={formRef} onSubmit={handleSubmit} className='mt-4'>
-            <h3>How are you feeling today?</h3>
+          <Form ref={formRef} onSubmit={handleFormSubmit} className='mt-4'>
+            <h3 className='mood-check'>How are you feeling today?</h3>
             <MoodSelector selectedMood={selectedMood} onSelectMood={handleMoodSelect} />
-            <h3 className='mt-4'>Represents 21oz of water</h3>
+            <h3 className='mt-4 mood-check' >Represents 21oz of water</h3>
 
             <Form.Group controlId='water_intake' className='d-flex align-items-center'>
               <Form.Label className='mr-3'></Form.Label>
-              {/* <WaterIntake waterIntake={formData.water_intake} onIncrement={handleIncrement} onDecrement={handleDecrement} /> */}
               <WaterIntake
                 waterIntake={formData.water_intake}
                 onIncrement={() => handleIncrement('water_intake', 21)}
                 onDecrement={() => handleDecrement('water_intake', 21)}
               />
             </Form.Group>
+            <p className='disclaimer'>* based on recommended 126 ounces per day</p>
 
-            <h3 className='mt-4'>Represents 800mgs of sodium</h3>
+            <h3 className='mt-4 mood-check'>Represents 800mgs of sodium</h3>
 
             <Form.Group controlId='salt_intake' className='d-flex align-items-center'>
               <Form.Label className='mr-3'></Form.Label>
@@ -264,13 +264,22 @@ export default function Home() {
                 onDecrement={() => handleDecrement('salt_intake', 800)}
               />
             </Form.Group>
-
+            <p className='disclaimer'>* based on recommended 4800mgs</p>
+{/* 
             {error && <Alert variant='danger' className='mt-3'>{error}</Alert>}
-            {success && <Alert variant='success' className='mt-3'>Data submitted successfully!</Alert>}
-
-            <Button type='submit' variant='primary' className='mt-4'>
-              {existingEntry ? 'Update' : 'Submit'}
-            </Button>
+            {success && <Alert variant='success' className='mt-3'>Data submitted successfully!</Alert>} */}
+            <div className=' update-button button-container-1'>
+              <span className='mas'>
+                {existingEntry ? 'Update' : 'Submit'}
+              </span>
+              <button
+                type='submit'
+                ref={buttonRef}
+                id='submit-button'
+              >
+                {existingEntry ? 'Update' : 'Submit'}
+              </button>
+            </div>
           </Form>
         </Col>
       </Row>

@@ -60,6 +60,10 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+.update-button{
+  margin-top: 2vh;
+}
+
 .form-control,
 .form-control:focus,
 .form-select,

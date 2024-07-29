@@ -56,3 +56,51 @@
 .nauseous, .fainting, .bed-bound {
   background-color: #FF3577;
 }
+
+
+/* home */
+
+.HomeWelcome{
+  font-size: 20px;
+  margin-top: 2em;
+  margin-bottom: -10px;
+}
+
+.mood-check{
+  font-size: 16px;
+  font-style: italic;
+  margin-bottom:2em;
+  padding-top: 2em;
+  font-weight: bold;
+}
+
+.mood-pic {
+  width: 45px;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.salt-pic {
+  width: 33px;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.bi-droplet, .bi-droplet-fill{
+  width:35px;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.disclaimer {
+  margin-top: 1em;
+  font-style: italic;
+}
+
+.daily-log {
+  margin-bottom: 3em;
+}
+
+.update-button{
+  margin-top: -2vh;
+}

@@ -32,6 +32,7 @@ const WaterIntake = ({ waterIntake, onIncrement, onDecrement }) => {
         key={i}
         style={{ cursor: 'pointer', display: 'inline-block' }}
         onClick={() => handleClick(i)}
+        className='water-intake-img'
       >
         {i < waterUnits ? fullWaterImage : emptyWaterImage}
       </div>

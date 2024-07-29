@@ -64,7 +64,7 @@ export default function Header({ onDateChange }) {
     <div className='Header'>
     <Navbar bg="#223863">
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Nav className="ml-auto">
+        <Nav className="ml-auto nav-stuff">
           {loggedIn ? (
             <>
               <Nav.Link onClick={handleLogout}>Logout</Nav.Link>
