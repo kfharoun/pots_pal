@@ -26,6 +26,15 @@ class DataSerializer(serializers.ModelSerializer):
             'meal_item': {'required': False},
             'activity_item': {'required': False},
         }
+        def validate_meal_item(self, value):
+            if value is None:
+                return []
+            return value
+
+        def validate_activity_item(self, value):
+            if value is None:
+                return []
+            return value
 class DaySerializer(serializers.ModelSerializer):
     user = serializers.SlugRelatedField(
         slug_field='username',

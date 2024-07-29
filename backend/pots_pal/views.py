@@ -157,6 +157,7 @@ class DaysByUsernameView(generics.ListCreateAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class DataByUsernameView(generics.ListCreateAPIView):
+    queryset = Data.objects.all()
     serializer_class = DataSerializer
     permission_classes = [AllowAny]
 
