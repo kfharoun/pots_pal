@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { Container, Row, Col, Form, Button, Alert } from 'react-bootstrap'
@@ -14,6 +14,7 @@ export default function Login() {
   const [formState, setFormState] = useState(initialState)
   const [users, setUsers] = useState([])
   const navigate = useNavigate()
+  const buttonRef = useRef(null)
 
   useEffect(() => {
     const loggedInUser = localStorage.getItem('loggedInUser')
@@ -54,9 +55,14 @@ export default function Login() {
       return
     }
 
-    localStorage.setItem('loggedInUser', user.username)
-    window.dispatchEvent(new Event('storage')) // Dispatch event to trigger storage change
-    navigate(`/home/${user.username}`)
+    if (buttonRef.current) {
+      buttonRef.current.classList.add('active') 
+    }
+
+    setTimeout(() => {
+      localStorage.setItem('loggedInUser', user.username)
+      navigate(`/home/${user.username}`)
+    }, 700)
   }
 
   const handleChange = (e) => {
@@ -67,12 +73,17 @@ export default function Login() {
     })
   }
 
+  
+
   return (
+    <div className='Login'>
+      <h2 className="text-center mb-4 login-text">ready to spot the patterns?</h2>
+      <h2 className='login-emoji'>✨</h2>
     <Container className="mt-5">
-      {/* <Header /> */}
+      <Header />
       <Row className="justify-content-center">
         <Col md={10}>
-          <h2 className="text-center mb-4">Login</h2>
+          
           <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3">
               <Form.Label>Username</Form.Label>
@@ -96,12 +107,13 @@ export default function Login() {
             </Form.Group>
             <div className='button-container-1'>
             <span class="mas">login</span>
-            <button variant="primary" type="submit" className="w-100" id='work'>login</button>
+            <button ref={buttonRef} variant="primary" type="submit" className="w-100" id='work'>login</button>
             </div>
             {formState.error && <Alert variant="danger" className="mt-3">{formState.error}</Alert>}
           </Form>
         </Col>
       </Row>
     </Container>
+    </div>
   )
 }

@@ -11,10 +11,6 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-body {
-  background-color: #15223D;
-  color: #E8ECF6;
-}
 a, .nav-link {
   font-weight: 500;
   color: #E8ECF6;
@@ -34,6 +30,9 @@ body {
   text-transform: lowercase;
   font-optical-sizing: auto;
   font-style: normal;
+  background-color: #15223D;
+  color: #E8ECF6;
+  font-size: 14px;
 }
 
 h1 {

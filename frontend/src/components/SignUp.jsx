@@ -1,34 +1,45 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import axios from 'axios'
-import { useAuth0 } from '@auth0/auth0-react'
 import { Form, Button, Container, Row, Col, Alert } from 'react-bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css'
+import Header from './Header'
 
 const CustomSignUp = () => {
-  const { loginWithRedirect } = useAuth0()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [username, setUsername] = useState('')
   const [error, setError] = useState('')
+  const buttonRef = useRef(null)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+
+    if (buttonRef.current) {
+      buttonRef.current.classList.add('active')
+    }
+
     try {
       const response = await axios.post('http://localhost:8000/users/', {
+        username,
         email,
         password,
-        username,
-      });
-      console.log('Server response:', response.data)
-      await loginWithRedirect()
+       
+      })
+      console.log('Server response:', response.data);
+
+      // Wait for the animation to complete before continuing
+      setTimeout(() => {
+        window.location.href = '/login'; // Redirect or handle after animation
+      }, 700)
     } catch (error) {
       console.error('Error signing up:', error.response?.data || error.message)
-      setError('Error signing up');
+      setError('Error signing up')
     }
-  };
+  }
 
   return (
     <Container className="mt-5">
+      <Header />
       <Row className="justify-content-center">
         <Col md={6}>
           <h2 className="text-center mb-4">Sign Up</h2>
@@ -60,7 +71,17 @@ const CustomSignUp = () => {
                 required
               />
             </Form.Group>
-            <Button variant="primary" type="submit" className="w-100">Sign Up</Button>
+            <div className="button-container-1">
+              <span className="mas">Sign Up</span>
+              <button 
+                variant="primary" 
+                type="submit" 
+                className="w-100" 
+                ref={buttonRef}
+              >
+                Sign Up
+              </button>
+            </div>
             {error && <Alert variant="danger" className="mt-3">{error}</Alert>}
           </Form>
         </Col>

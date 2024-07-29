@@ -39,8 +39,8 @@ $col) {
       }
 .button-container-1 {
     position: relative;
-    width: 150px;
-    height: 50px;
+    width: 90px;
+    height: 40px;
     margin-left: auto;
     margin-right: auto;
     margin-top: 6vh;
@@ -71,7 +71,7 @@ $col) {
     animation: ani2 0.7s steps(22) forwards;
     color: #E8ECF6;
 
-    &:hover {
+    &:hover, &:active {
       -webkit-animation: ani 0.7s steps(22) forwards;
       animation: ani 0.7s steps(22) forwards;
  
@@ -83,12 +83,10 @@ $col) {
 	position: absolute;
 	color: #E8ECF6;
 	text-align: center;
-	width: 101%;
-	// font-family: "Lato", sans-serif;
-	// font-weight: 300;
+	width: 100%;
 	position: absolute;
-	// font-size: 11px;
-	margin-top: 13px;
+	margin-top: 10px;
 	overflow: hidden;
-	font-weight: bold;
+    width: 90px;
+    height: 40px;
 }
