@@ -4,11 +4,14 @@ import Main from './components/Main'
 import 'react-calendar/dist/Calendar.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import './App.css'
+import './animations.scss'
+
 
 function App() {
 
   return (
     <div className='App'>
+      <Header />
       <Main />
     </div>
   )

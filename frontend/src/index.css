@@ -3,9 +3,7 @@
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  background-color: #223863;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -13,13 +11,17 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
+body {
+  background-color: #15223D;
+  color: #E8ECF6;
+}
+a, .nav-link {
   font-weight: 500;
-  color: #646cff;
+  color: #E8ECF6;
   text-decoration: inherit;
 }
-a:hover {
-  color: #535bf2;
+a:hover, .nav-link:hover {
+  color: #E8ECF6;
 }
 
 body {
@@ -28,6 +30,10 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  font-family: "Nunito", sans-serif;
+  text-transform: lowercase;
+  font-optical-sizing: auto;
+  font-style: normal;
 }
 
 h1 {
@@ -42,9 +48,10 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: #223863;
   cursor: pointer;
   transition: border-color 0.25s;
+  color: #E8ECF6;
 }
 button:hover {
   border-color: #646cff;
@@ -54,7 +61,27 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-@media (prefers-color-scheme: light) {
+.form-control,
+.form-control:focus,
+.form-select,
+.form-select:focus,
+textarea.form-control,
+textarea.form-control:focus,
+input[type="text"].form-control,
+input[type="text"].form-control:focus,
+input[type="email"].form-control,
+input[type="email"].form-control:focus,
+input[type="password"].form-control,
+input[type="password"].form-control:focus {
+  background-color: #223863;
+  outline: none;
+  box-shadow: none; 
+  border-color: #223863;
+  border-width: 1px;
+  color:#E8ECF6;
+}
+
+/* @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
     background-color: #ffffff;
@@ -65,4 +92,5 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
-}
+} */
+

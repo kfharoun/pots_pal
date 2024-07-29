@@ -1,0 +1,94 @@
+
+@mixin button($bcolor,
+$url,
+$x1,
+$y1,
+$bor,
+$col) {
+ background: $bcolor;
+ -webkit-mask: url($url);
+ mask: url($url);
+ -webkit-mask-size: $x1 $y1;
+ mask-size: $x1 $y1;
+ border: $bor;
+ color: $col;
+}
+@keyframes ani {
+    from {
+        -webkit-mask-position: 0 0;
+        mask-position: 0 0;
+       }
+      
+       to {
+        -webkit-mask-position: 100% 0;
+        mask-position: 100% 0;
+       }
+      }
+
+
+@keyframes ani2 {
+    from {
+        -webkit-mask-position: 100% 0;
+        mask-position: 100% 0;
+       }
+      
+       to {
+        -webkit-mask-position: 0 0;
+        mask-position: 0 0;
+       }
+      }
+.button-container-1 {
+    position: relative;
+    width: 150px;
+    height: 50px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 6vh;
+    overflow: hidden;
+    // border: 1px solid;
+    // font-weight: 300;
+    // font-size: 20px;
+    transition: 0.5s;
+    letter-spacing: 1px;
+     border-radius: 8px;
+
+  button {
+    width: 101%;
+    height: 100%;
+    // font-weight: 300; 
+    // font-size: 11px;
+    letter-spacing: 1px;
+    color: #223863;
+
+    @include button(#223863,
+      "https://raw.githubusercontent.com/robin-dela/css-mask-animation/master/img/nature-sprite.png",
+      2300%,
+      100%,
+      none,
+      #E8ECF6);
+    cursor: pointer;
+    -webkit-animation: ani2 0.7s steps(22) forwards;
+    animation: ani2 0.7s steps(22) forwards;
+    color: #E8ECF6;
+
+    &:hover {
+      -webkit-animation: ani 0.7s steps(22) forwards;
+      animation: ani 0.7s steps(22) forwards;
+ 
+    }
+  }
+}
+
+.mas {
+	position: absolute;
+	color: #E8ECF6;
+	text-align: center;
+	width: 101%;
+	// font-family: "Lato", sans-serif;
+	// font-weight: 300;
+	position: absolute;
+	// font-size: 11px;
+	margin-top: 13px;
+	overflow: hidden;
+	font-weight: bold;
+}

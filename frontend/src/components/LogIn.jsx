@@ -69,7 +69,7 @@ export default function Login() {
 
   return (
     <Container className="mt-5">
-      <Header />
+      {/* <Header /> */}
       <Row className="justify-content-center">
         <Col md={10}>
           <h2 className="text-center mb-4">Login</h2>
@@ -94,7 +94,10 @@ export default function Login() {
                 required
               />
             </Form.Group>
-            <Button variant="primary" type="submit" className="w-100">Login</Button>
+            <div className='button-container-1'>
+            <span class="mas">login</span>
+            <button variant="primary" type="submit" className="w-100" id='work'>login</button>
+            </div>
             {formState.error && <Alert variant="danger" className="mt-3">{formState.error}</Alert>}
           </Form>
         </Col>
