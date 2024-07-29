@@ -38,11 +38,13 @@ const CustomSignUp = () => {
   }
 
   return (
+    <div className='signup'>      
+    <h2 className="text-center mb-4 login-text">create an account?</h2>
+      <h2 className='login-emoji'>✨</h2>
     <Container className="mt-5">
       <Header />
       <Row className="justify-content-center">
         <Col md={6}>
-          <h2 className="text-center mb-4">Sign Up</h2>
           <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3">
               <Form.Label>Email</Form.Label>
@@ -87,6 +89,7 @@ const CustomSignUp = () => {
         </Col>
       </Row>
     </Container>
+    </div>
   )
 }
 
