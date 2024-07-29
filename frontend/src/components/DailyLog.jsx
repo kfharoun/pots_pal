@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
-import { useParams } from 'react-router-dom'
+import { useParams, useLocation, useNavigate } from 'react-router-dom'
 import { Button, Alert } from 'react-bootstrap'
 import Header from './Header'
 
 const DailyLog = () => {
   const { username } = useParams()
-  const [currentDate, setCurrentDate] = useState(new Date().toISOString().split('T')[0])
+  const navigate = useNavigate()
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const dateParam = queryParams.get('date') || new Date().toISOString().split('T')[0]
+  const [currentDate, setCurrentDate] = useState(dateParam)
   const [logData, setLogData] = useState({
     high_heart_rate: '',
     low_heart_rate: '',
@@ -22,7 +26,7 @@ const DailyLog = () => {
   const [success, setSuccess] = useState(false)
 
   useEffect(() => {
-    const getDataData = async () => {
+    const getData = async () => {
       try {
         const logResponse = await axios.get(`http://localhost:8000/data/${username}/date/${currentDate}/`)
         const logData = logResponse.data
@@ -43,7 +47,7 @@ const DailyLog = () => {
       }
     }
 
-    getDataData()
+    getData()
   }, [username, currentDate])
 
   const renderLogData = () => (
@@ -205,9 +209,9 @@ const DailyLog = () => {
 
   return (
     <>
-      <Header currentDate={currentDate} onDateChange={setCurrentDate} />
+      <Header />
       <div className='container mt-4'>
-        <h1>Daily Log</h1>
+        <h1>log</h1>
         {error && <Alert variant='danger' className='mt-3'>{error}</Alert>}
         {success && <Alert variant='success' className='mt-3'>Data submitted successfully!</Alert>}
         {isEditing ? renderForm() : renderLogData()}

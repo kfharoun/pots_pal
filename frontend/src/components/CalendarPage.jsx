@@ -3,9 +3,11 @@ import { useParams } from 'react-router-dom'
 import Calendar from 'react-calendar'
 import axios from 'axios'
 import Header from './Header'
+import { useNavigate } from 'react-router-dom'
 // import 'react-calendar/dist/Calendar.css'
 
 const CalendarPage = () => {
+  const navigate = useNavigate()
   const { username } = useParams()
   const [datesWithStatus, setDatesWithStatus] = useState({})
   const [aggregatedData, setAggregatedData] = useState(null)
@@ -84,7 +86,7 @@ const CalendarPage = () => {
       setSelectedFilter(null)
       setAggregatedData(null)
 
-      // Fetch and show log data for the selected date
+      // show log data for the selected date
       const dateString = selectedDate.toISOString().split('T')[0]
       try {
         const response = await axios.get(`http://localhost:8000/data/${username}/date/${dateString}/`)
@@ -108,8 +110,14 @@ const CalendarPage = () => {
     }
   }
 
+  const handleEditLog = () => {
+    const dateString = selectedDate.toISOString().split('T')[0]
+    navigate(`/log/${username}?date=${dateString}`)
+  }
+
   const renderLogData = (data) => {
     if (!data) return null
+  
     return (
       <div>
         <h4>Log Data for {selectedDate.toISOString().split('T')[0]}</h4>
@@ -128,6 +136,7 @@ const CalendarPage = () => {
             <div key={index}>{item}</div>
           )) : <p>No activity items logged.</p>}
         </div>
+        <button onClick={handleEditLog} variant="primary" className='mt-4'>Edit Log</button>
       </div>
     )
   }
