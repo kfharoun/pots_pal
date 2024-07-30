@@ -145,8 +145,8 @@ export default function Home() {
       const dataData = {
         water_intake: formData.water_intake,
         salt_intake: formData.salt_intake,
-        meal_item: [],
-        activity_item: []
+        // meal_item: [],
+        // activity_item: []
       }
 
       try {

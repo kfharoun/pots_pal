@@ -230,7 +230,36 @@
 .ratetitle.ex {
   margin-top: 50px;
 }
+
+.ratetitle.ex.form-label{
+  margin-top: 10px;
+}
 .plus {
   margin-top: 20px;
-  margin-left: 20em;
+  margin-right: 20em;
 }
+
+.array-org.form {
+  justify-content: center;
+}
+
+.weathertext {
+  margin-top: 20px;
+}
+
+.form-control {
+  font-size: 13px;
+}
+
+.weather.rate.form {
+  margin-bottom: 16px;
+}
+
+.index.form-control {
+  width: 100px;
+}
+
+.logData {
+  margin-top: 60px;
+}
+

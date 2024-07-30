@@ -26,6 +26,11 @@ const DailyLog = () => {
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(true)
   const {addBottom} = useRef()
+  const mealRefs = useRef([])
+  const activityRefs = useRef([])
+  mealRefs.current = []
+  activityRefs.current = []
+
 
   useEffect(() => {
     const getData = async () => {
@@ -54,7 +59,7 @@ const DailyLog = () => {
 
   const renderLogData = () => (
     <div className='logData'>
-      <p className='ratetitle'> Heart Rate</p>
+      <p className='ratetitle title'> Heart Rate</p>
       <div className='heartrate'>
         <div className='high rate'>
         <p>daily high</p> <p className='data heart'>{logData.high_heart_rate} </p> 
@@ -65,7 +70,7 @@ const DailyLog = () => {
 
       </div>
       <div className='weather rate'>
-        <p>average temp </p> <p className='data heart'>{logData.weather}</p>
+        <p >average temp </p> <p className='data heart'>{logData.weather}</p>
       </div>
       <div>
         <div className='foodActivity'>
@@ -92,9 +97,6 @@ const DailyLog = () => {
     </div>
   )
 
-  const scrollToBottom = () => {
-    addBottom.current.scrollIntoView({ behavior: "smooth" })
-  }
 
   const renderForm = () => (
     <div className='logData'>
@@ -121,9 +123,9 @@ const DailyLog = () => {
         />
       </Form.Group>
       </div>
-      <div className='weather rate'>
+      <div className='weather rate form'>
       <Form.Group controlId="formWeather">
-        <Form.Label>average temp</Form.Label>
+        <Form.Label className='weathertext'>average temp</Form.Label>
         <Form.Control
           type="text"
           name="weather"
@@ -137,14 +139,15 @@ const DailyLog = () => {
         <Form.Label  className='ratetitle'>food & drink</Form.Label>
         <div className='array-org form'>
         {logData.meal_item.map((item, index) => (
-          <div key={index} className="d-flex align-items-center mb-2" ref={addBottom}>
+          <div key={index} className="d-flex align-items-center mb-2" ref={index === logData.meal_item.length - 1 ? addBottom : null}>
             <Form.Control
               type="text"
               value={item}
               onChange={(e) => handleChange(e, index, 'meal')}
-              className="me-2"
+              className="me-2 index"
+              ref={(el) => mealRefs.current[index] = el}
             />
-            <div className='minus' variant="danger" onClick={() => handleRemoveInput(index, 'meal')}><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-patch-minus" viewBox="0 0 16 16">
+            <div className='minus' variant="danger" onClick={() => handleRemoveInput(index, 'meal')}><svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" fill="currentColor" class="bi bi-patch-minus" viewBox="0 0 16 16">
               <path fill-rule="evenodd" d="M5.5 8a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1H6a.5.5 0 0 1-.5-.5"/>
               <path d="m10.273 2.513-.921-.944.715-.698.622.637.89-.011a2.89 2.89 0 0 1 2.924 2.924l-.01.89.636.622a2.89 2.89 0 0 1 0 4.134l-.637.622.011.89a2.89 2.89 0 0 1-2.924 2.924l-.89-.01-.622.636a2.89 2.89 0 0 1-4.134 0l-.622-.637-.89.011a2.89 2.89 0 0 1-2.924-2.924l.01-.89-.636-.622a2.89 2.89 0 0 1 0-4.134l.637-.622-.011-.89a2.89 2.89 0 0 1 2.924-2.924l.89.01.622-.636a2.89 2.89 0 0 1 4.134 0l-.715.698a1.89 1.89 0 0 0-2.704 0l-.92.944-1.32-.016a1.89 1.89 0 0 0-1.911 1.912l.016 1.318-.944.921a1.89 1.89 0 0 0 0 2.704l.944.92-.016 1.32a1.89 1.89 0 0 0 1.912 1.911l1.318-.016.921.944a1.89 1.89 0 0 0 2.704 0l.92-.944 1.32.016a1.89 1.89 0 0 0 1.911-1.912l-.016-1.318.944-.921a1.89 1.89 0 0 0 0-2.704l-.944-.92.016-1.32a1.89 1.89 0 0 0-1.912-1.911z"/>
             </svg>
@@ -152,7 +155,7 @@ const DailyLog = () => {
           </div>
         ))}
         </div>
-        <div onClick={scrollToBottom} className='plus' variant="primary" onClick={() => handleAddInput('meal')}> <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-patch-plus" viewBox="0 0 16 16">
+        <div className='plus' variant="primary" onClick={() => handleAddInput('meal')}> <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" fill="currentColor" class="bi bi-patch-plus" viewBox="0 0 16 16">
           <path fill-rule="evenodd" d="M8 5.5a.5.5 0 0 1 .5.5v1.5H10a.5.5 0 0 1 0 1H8.5V10a.5.5 0 0 1-1 0V8.5H6a.5.5 0 0 1 0-1h1.5V6a.5.5 0 0 1 .5-.5"/>
           <path d="m10.273 2.513-.921-.944.715-.698.622.637.89-.011a2.89 2.89 0 0 1 2.924 2.924l-.01.89.636.622a2.89 2.89 0 0 1 0 4.134l-.637.622.011.89a2.89 2.89 0 0 1-2.924 2.924l-.89-.01-.622.636a2.89 2.89 0 0 1-4.134 0l-.622-.637-.89.011a2.89 2.89 0 0 1-2.924-2.924l.01-.89-.636-.622a2.89 2.89 0 0 1 0-4.134l.637-.622-.011-.89a2.89 2.89 0 0 1 2.924-2.924l.89.01.622-.636a2.89 2.89 0 0 1 4.134 0l-.715.698a1.89 1.89 0 0 0-2.704 0l-.92.944-1.32-.016a1.89 1.89 0 0 0-1.911 1.912l.016 1.318-.944.921a1.89 1.89 0 0 0 0 2.704l.944.92-.016 1.32a1.89 1.89 0 0 0 1.912 1.911l1.318-.016.921.944a1.89 1.89 0 0 0 2.704 0l.92-.944 1.32.016a1.89 1.89 0 0 0 1.911-1.912l-.016-1.318.944-.921a1.89 1.89 0 0 0 0-2.704l-.944-.92.016-1.32a1.89 1.89 0 0 0-1.912-1.911z"/>
         </svg></div> 
@@ -167,10 +170,11 @@ const DailyLog = () => {
               type="text"
               value={item}
               onChange={(e) => handleChange(e, index, 'activity')}
-              className="me-2"
+              className="me-2 index"
+              ref={(el) => activityRefs.current[index] = el} 
             />
             <div className='minus' variant="danger" onClick={() => handleRemoveInput(index, 'activity')}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-patch-minus" viewBox="0 0 16 16">
+            <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" fill="currentColor" class="bi bi-patch-minus" viewBox="0 0 16 16">
               <path fill-rule="evenodd" d="M5.5 8a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1H6a.5.5 0 0 1-.5-.5"/>
               <path d="m10.273 2.513-.921-.944.715-.698.622.637.89-.011a2.89 2.89 0 0 1 2.924 2.924l-.01.89.636.622a2.89 2.89 0 0 1 0 4.134l-.637.622.011.89a2.89 2.89 0 0 1-2.924 2.924l-.89-.01-.622.636a2.89 2.89 0 0 1-4.134 0l-.622-.637-.89.011a2.89 2.89 0 0 1-2.924-2.924l.01-.89-.636-.622a2.89 2.89 0 0 1 0-4.134l.637-.622-.011-.89a2.89 2.89 0 0 1 2.924-2.924l.89.01.622-.636a2.89 2.89 0 0 1 4.134 0l-.715.698a1.89 1.89 0 0 0-2.704 0l-.92.944-1.32-.016a1.89 1.89 0 0 0-1.911 1.912l.016 1.318-.944.921a1.89 1.89 0 0 0 0 2.704l.944.92-.016 1.32a1.89 1.89 0 0 0 1.912 1.911l1.318-.016.921.944a1.89 1.89 0 0 0 2.704 0l.92-.944 1.32.016a1.89 1.89 0 0 0 1.911-1.912l-.016-1.318.944-.921a1.89 1.89 0 0 0 0-2.704l-.944-.92.016-1.32a1.89 1.89 0 0 0-1.912-1.911z"/>
             </svg>
@@ -226,6 +230,22 @@ const DailyLog = () => {
     }
   }
 
+  // Effect to scroll to the last added meal item
+  useEffect(() => {
+    const lastMealIndex = logData.meal_item.length - 1;
+    if (mealRefs.current[lastMealIndex]) {
+      mealRefs.current[lastMealIndex].scrollIntoView({ behavior: 'smooth', block: 'end' })
+    }
+  }, [logData.meal_item])
+
+  // Effect to scroll to the last added activity item
+  useEffect(() => {
+    const lastActivityIndex = logData.activity_item.length - 1
+    if (activityRefs.current[lastActivityIndex]) {
+      activityRefs.current[lastActivityIndex].scrollIntoView({ behavior: 'smooth', block: 'end' })
+    }
+  }, [logData.activity_item])
+
   const handleAddInput = (type) => {
     if (type === 'meal') {
       setLogData((prev) => ({
@@ -242,16 +262,14 @@ const DailyLog = () => {
 
   const handleRemoveInput = (index, type) => {
     if (type === 'meal') {
-      const newMealItems = logData.meal_item.filter((_, i) => i !== index)
       setLogData((prev) => ({
         ...prev,
-        meal_item: newMealItems,
+        meal_item: prev.meal_item.filter((_, i) => i !== index),
       }))
     } else if (type === 'activity') {
-      const newActivityItems = logData.activity_item.filter((_, i) => i !== index)
       setLogData((prev) => ({
         ...prev,
-        activity_item: newActivityItems,
+        activity_item: prev.activity_item.filter((_, i) => i !== index),
       }))
     }
   }
