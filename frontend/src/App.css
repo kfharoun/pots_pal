@@ -169,3 +169,68 @@
 .update-button{
   margin-top: -2vh;
 }
+
+.deletediv {
+  margin-top: 3em;
+}
+
+/* daily log */
+
+.heartrate {
+  display: flex;
+  gap: 30px;
+}
+
+.rate {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: center;
+}
+
+.data.heart {
+  margin-left: 18px;
+  padding: 10px px;
+  font-weight: bold;
+}
+
+.ratetitle {
+  font-size: 16px;
+  letter-spacing: 1px;
+}
+
+.weather {
+  justify-content: center;
+  margin-bottom: 50px;
+}
+
+.mealitem {
+  display: flex;
+  background-color: #223863;
+  border-radius: 20px;
+  flex: 1 1 calc(50% - 10px); 
+  box-sizing: border-box;
+  width: 70%;
+  align-items: center;
+  justify-content: center;
+}
+
+.item {
+  padding-top: 8px;
+}
+
+.array-org {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px; 
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.ratetitle.ex {
+  margin-top: 50px;
+}
+.plus {
+  margin-top: 20px;
+  margin-left: 20em;
+}

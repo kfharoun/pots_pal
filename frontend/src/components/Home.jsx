@@ -298,14 +298,14 @@ export default function Home() {
             <Form.Group className='mt-4'>
             <div className=' update-button button-container-1'>
               <span className='mas'>
-                {existingEntry ? 'Update' : 'Submit'}
+                {existingEntry ? 'update' : 'submit'}
               </span>
               <button
                 type='submit'
                 ref={buttonRef}
                 id='submit-button'
               >
-                {existingEntry ? 'Update' : 'Submit'}
+                {existingEntry ? 'update' : 'submit'}
               </button>
             </div>
             </Form.Group>
@@ -324,8 +324,9 @@ export default function Home() {
         </Col>
         
       </Row>
-      <a className='startOver' onClick={toggleDeleteModal}>start the day over?</a>
-
+      <div className='deletediv'>
+        <a className='delete-link' onClick={toggleDeleteModal}>start the day over?</a>
+      </div>
       <Modal
         show={showDeleteModal}
         onHide={toggleDeleteModal}

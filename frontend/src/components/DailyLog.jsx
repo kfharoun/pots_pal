@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 import { useParams, useLocation, useNavigate } from 'react-router-dom'
 import { Button, Alert, Form } from 'react-bootstrap'
@@ -6,6 +6,7 @@ import Header from './Header'
 
 const DailyLog = () => {
   const { username } = useParams()
+  const { buttonRef }= useRef()
   const navigate = useNavigate()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -20,10 +21,11 @@ const DailyLog = () => {
     favorite_meal: false,
     favorite_activity: false,
   })
-  const [isEditing, setIsEditing] = useState(true)
+  const [isEditing, setIsEditing] = useState(false)
   const [favorites, setFavorites] = useState({ food_items: [], activity_items: [] })
   const [error, setError] = useState(null)
-  const [success, setSuccess] = useState(false)
+  const [success, setSuccess] = useState(true)
+  const {addBottom} = useRef()
 
   useEffect(() => {
     const getData = async () => {
@@ -51,33 +53,56 @@ const DailyLog = () => {
   }, [username, currentDate])
 
   const renderLogData = () => (
-    <div>
-      <p>High Heart Rate: {logData.high_heart_rate}</p>
-      <p>Low Heart Rate: {logData.low_heart_rate}</p>
-      <p>Weather: {logData.weather}</p>
-      <div>
-        <p>Food Items:</p>
-        {Array.isArray(logData.meal_item) && logData.meal_item.length > 0 ? logData.meal_item.map((item, index) => (
-          <div key={index}>
-            {item}
-          </div>
-        )) : <p>No food items logged.</p>}
+    <div className='logData'>
+      <p className='ratetitle'> Heart Rate</p>
+      <div className='heartrate'>
+        <div className='high rate'>
+        <p>daily high</p> <p className='data heart'>{logData.high_heart_rate} </p> 
+        </div>
+        <div className='low rate'>
+        <p>daily low</p> <p className='data heart'>{logData.low_heart_rate}</p>
+        </div>
+
+      </div>
+      <div className='weather rate'>
+        <p>average temp </p> <p className='data heart'>{logData.weather}</p>
       </div>
       <div>
-        <p>Activity Items:</p>
-        {Array.isArray(logData.activity_item) && logData.activity_item.length > 0 ? logData.activity_item.map((item, index) => (
-          <div key={index}>
-            {item}
+        <div className='foodActivity'>
+        <p className='ratetitle'>food & drink</p>
+        <div className='array-org'>
+        {Array.isArray(logData.meal_item) && logData.meal_item.length > 0 ? logData.meal_item.map((item, index) => (
+          <div key={index} className='mealitem'>
+            <p className='item'>{item}</p>
           </div>
-        )) : <p>No activities logged.</p>}
+        )) : <p>nothing yet!</p>}
+      </div>
+      </div>
+      <div>
+        <p className='ratetitle ex'>exercise & activity</p>
+        <div className='array-org'>
+        {Array.isArray(logData.activity_item) && logData.activity_item.length > 0 ? logData.activity_item.map((item, index) => (
+          <div key={index} className='mealitem'>
+            <p className='item'>{item}</p>
+          </div>
+        )) : <p>nothing yet!</p>}
+        </div>
+      </div>
       </div>
     </div>
   )
 
+  const scrollToBottom = () => {
+    addBottom.current.scrollIntoView({ behavior: "smooth" })
+  }
+
   const renderForm = () => (
+    <div className='logData'>
+      <p className='ratetitle'>Heart Rate</p>
     <Form onSubmit={handleSubmit}>
+      <div className='heartrate'>
       <Form.Group controlId="formHighHeartRate">
-        <Form.Label>High Heart Rate</Form.Label>
+        <Form.Label>daily high</Form.Label>
         <Form.Control
           type="text"
           name="high_heart_rate"
@@ -85,8 +110,9 @@ const DailyLog = () => {
           onChange={(e) => handleChange(e, null, null)}
         />
       </Form.Group>
+      
       <Form.Group controlId="formLowHeartRate">
-        <Form.Label>Low Heart Rate</Form.Label>
+        <Form.Label>daily low</Form.Label>
         <Form.Control
           type="text"
           name="low_heart_rate"
@@ -94,8 +120,10 @@ const DailyLog = () => {
           onChange={(e) => handleChange(e, null, null)}
         />
       </Form.Group>
+      </div>
+      <div className='weather rate'>
       <Form.Group controlId="formWeather">
-        <Form.Label>Weather</Form.Label>
+        <Form.Label>average temp</Form.Label>
         <Form.Control
           type="text"
           name="weather"
@@ -103,23 +131,36 @@ const DailyLog = () => {
           onChange={(e) => handleChange(e, null, null)}
         />
       </Form.Group>
+      </div>
+      
       <Form.Group>
-        <Form.Label>Food Items</Form.Label>
+        <Form.Label  className='ratetitle'>food & drink</Form.Label>
+        <div className='array-org form'>
         {logData.meal_item.map((item, index) => (
-          <div key={index} className="d-flex align-items-center mb-2">
+          <div key={index} className="d-flex align-items-center mb-2" ref={addBottom}>
             <Form.Control
               type="text"
               value={item}
               onChange={(e) => handleChange(e, index, 'meal')}
               className="me-2"
             />
-            <Button variant="danger" onClick={() => handleRemoveInput(index, 'meal')}>Remove</Button>
+            <div className='minus' variant="danger" onClick={() => handleRemoveInput(index, 'meal')}><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-patch-minus" viewBox="0 0 16 16">
+              <path fill-rule="evenodd" d="M5.5 8a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1H6a.5.5 0 0 1-.5-.5"/>
+              <path d="m10.273 2.513-.921-.944.715-.698.622.637.89-.011a2.89 2.89 0 0 1 2.924 2.924l-.01.89.636.622a2.89 2.89 0 0 1 0 4.134l-.637.622.011.89a2.89 2.89 0 0 1-2.924 2.924l-.89-.01-.622.636a2.89 2.89 0 0 1-4.134 0l-.622-.637-.89.011a2.89 2.89 0 0 1-2.924-2.924l.01-.89-.636-.622a2.89 2.89 0 0 1 0-4.134l.637-.622-.011-.89a2.89 2.89 0 0 1 2.924-2.924l.89.01.622-.636a2.89 2.89 0 0 1 4.134 0l-.715.698a1.89 1.89 0 0 0-2.704 0l-.92.944-1.32-.016a1.89 1.89 0 0 0-1.911 1.912l.016 1.318-.944.921a1.89 1.89 0 0 0 0 2.704l.944.92-.016 1.32a1.89 1.89 0 0 0 1.912 1.911l1.318-.016.921.944a1.89 1.89 0 0 0 2.704 0l.92-.944 1.32.016a1.89 1.89 0 0 0 1.911-1.912l-.016-1.318.944-.921a1.89 1.89 0 0 0 0-2.704l-.944-.92.016-1.32a1.89 1.89 0 0 0-1.912-1.911z"/>
+            </svg>
+            </div>
           </div>
         ))}
-        <Button variant="primary" onClick={() => handleAddInput('meal')}>Add Food Item</Button>
+        </div>
+        <div onClick={scrollToBottom} className='plus' variant="primary" onClick={() => handleAddInput('meal')}> <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-patch-plus" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M8 5.5a.5.5 0 0 1 .5.5v1.5H10a.5.5 0 0 1 0 1H8.5V10a.5.5 0 0 1-1 0V8.5H6a.5.5 0 0 1 0-1h1.5V6a.5.5 0 0 1 .5-.5"/>
+          <path d="m10.273 2.513-.921-.944.715-.698.622.637.89-.011a2.89 2.89 0 0 1 2.924 2.924l-.01.89.636.622a2.89 2.89 0 0 1 0 4.134l-.637.622.011.89a2.89 2.89 0 0 1-2.924 2.924l-.89-.01-.622.636a2.89 2.89 0 0 1-4.134 0l-.622-.637-.89.011a2.89 2.89 0 0 1-2.924-2.924l.01-.89-.636-.622a2.89 2.89 0 0 1 0-4.134l.637-.622-.011-.89a2.89 2.89 0 0 1 2.924-2.924l.89.01.622-.636a2.89 2.89 0 0 1 4.134 0l-.715.698a1.89 1.89 0 0 0-2.704 0l-.92.944-1.32-.016a1.89 1.89 0 0 0-1.911 1.912l.016 1.318-.944.921a1.89 1.89 0 0 0 0 2.704l.944.92-.016 1.32a1.89 1.89 0 0 0 1.912 1.911l1.318-.016.921.944a1.89 1.89 0 0 0 2.704 0l.92-.944 1.32.016a1.89 1.89 0 0 0 1.911-1.912l-.016-1.318.944-.921a1.89 1.89 0 0 0 0-2.704l-.944-.92.016-1.32a1.89 1.89 0 0 0-1.912-1.911z"/>
+        </svg></div> 
       </Form.Group>
+     
       <Form.Group>
-        <Form.Label>Activity Items</Form.Label>
+        <Form.Label  className='ratetitle ex'>exercise & activity </Form.Label>
+        <div className='array-org form'>
         {logData.activity_item.map((item, index) => (
           <div key={index} className="d-flex align-items-center mb-2">
             <Form.Control
@@ -128,13 +169,37 @@ const DailyLog = () => {
               onChange={(e) => handleChange(e, index, 'activity')}
               className="me-2"
             />
-            <Button variant="danger" onClick={() => handleRemoveInput(index, 'activity')}>Remove</Button>
+            <div className='minus' variant="danger" onClick={() => handleRemoveInput(index, 'activity')}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-patch-minus" viewBox="0 0 16 16">
+              <path fill-rule="evenodd" d="M5.5 8a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1H6a.5.5 0 0 1-.5-.5"/>
+              <path d="m10.273 2.513-.921-.944.715-.698.622.637.89-.011a2.89 2.89 0 0 1 2.924 2.924l-.01.89.636.622a2.89 2.89 0 0 1 0 4.134l-.637.622.011.89a2.89 2.89 0 0 1-2.924 2.924l-.89-.01-.622.636a2.89 2.89 0 0 1-4.134 0l-.622-.637-.89.011a2.89 2.89 0 0 1-2.924-2.924l.01-.89-.636-.622a2.89 2.89 0 0 1 0-4.134l.637-.622-.011-.89a2.89 2.89 0 0 1 2.924-2.924l.89.01.622-.636a2.89 2.89 0 0 1 4.134 0l-.715.698a1.89 1.89 0 0 0-2.704 0l-.92.944-1.32-.016a1.89 1.89 0 0 0-1.911 1.912l.016 1.318-.944.921a1.89 1.89 0 0 0 0 2.704l.944.92-.016 1.32a1.89 1.89 0 0 0 1.912 1.911l1.318-.016.921.944a1.89 1.89 0 0 0 2.704 0l.92-.944 1.32.016a1.89 1.89 0 0 0 1.911-1.912l-.016-1.318.944-.921a1.89 1.89 0 0 0 0-2.704l-.944-.92.016-1.32a1.89 1.89 0 0 0-1.912-1.911z"/>
+            </svg>
+            </div>
           </div>
         ))}
-        <Button variant="primary" onClick={() => handleAddInput('activity')}>Add Activity Item</Button>
+         </div>
+        <div className='plus' variant="primary" onClick={() => handleAddInput('activity')}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-patch-plus" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M8 5.5a.5.5 0 0 1 .5.5v1.5H10a.5.5 0 0 1 0 1H8.5V10a.5.5 0 0 1-1 0V8.5H6a.5.5 0 0 1 0-1h1.5V6a.5.5 0 0 1 .5-.5"/>
+          <path d="m10.273 2.513-.921-.944.715-.698.622.637.89-.011a2.89 2.89 0 0 1 2.924 2.924l-.01.89.636.622a2.89 2.89 0 0 1 0 4.134l-.637.622.011.89a2.89 2.89 0 0 1-2.924 2.924l-.89-.01-.622.636a2.89 2.89 0 0 1-4.134 0l-.622-.637-.89.011a2.89 2.89 0 0 1-2.924-2.924l.01-.89-.636-.622a2.89 2.89 0 0 1 0-4.134l.637-.622-.011-.89a2.89 2.89 0 0 1 2.924-2.924l.89.01.622-.636a2.89 2.89 0 0 1 4.134 0l-.715.698a1.89 1.89 0 0 0-2.704 0l-.92.944-1.32-.016a1.89 1.89 0 0 0-1.911 1.912l.016 1.318-.944.921a1.89 1.89 0 0 0 0 2.704l.944.92-.016 1.32a1.89 1.89 0 0 0 1.912 1.911l1.318-.016.921.944a1.89 1.89 0 0 0 2.704 0l.92-.944 1.32.016a1.89 1.89 0 0 0 1.911-1.912l-.016-1.318.944-.921a1.89 1.89 0 0 0 0-2.704l-.944-.92.016-1.32a1.89 1.89 0 0 0-1.912-1.911z"/>
+        </svg>
+       
+        </div>
       </Form.Group>
-      <Button type="submit" variant="primary">Submit Log</Button>
+      <div className=' update-button button-container-1'>
+              <span className='mas'>
+                submit
+              </span>
+              <button
+                type='submit'
+                ref={buttonRef}
+                id='submit-button'
+              >
+                submit
+              </button>
+            </div>
     </Form>
+    </div>
   )
 
   const handleChange = (e, index, type) => {
@@ -193,6 +258,9 @@ const DailyLog = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    // if (buttonRef.current) {
+    //   buttonRef.current.classList.add('active')
+    // }
     try {
       const response = await axios.patch(`http://localhost:8000/data/${username}/${logData.id}/`, logData)
       setLogData(response.data)
@@ -212,15 +280,28 @@ const DailyLog = () => {
   return (
     <>
       <Header />
-      <div className='container mt-4'>
-        <h1>Log</h1>
-        {error && <Alert variant='danger' className='mt-3'>{error}</Alert>}
-        {success && <Alert variant='success' className='mt-3'>Data submitted successfully!</Alert>}
+      <div className='container mt-4 DailyLog'>
+        {/* {error && <Alert variant='danger' className='mt-3'>{error}</Alert>}
+        {success && <Alert variant='success' className='mt-3'>Data submitted successfully!</Alert>} */}
         {isEditing ? renderForm() : renderLogData()}
-        {!isEditing && <Button onClick={handleEdit} variant="primary" className='mt-4'>Edit Log</Button>}
+        <div className='update-button button-container-1'>
+          {!isEditing && (
+            <>
+              <span className='mas'>
+                edit
+              </span>
+              <button
+                onClick={handleEdit}
+                variant="primary"
+                ref={buttonRef} 
+              >
+                edit
+              </button>
+            </>
+          )}
+        </div>
       </div>
     </>
   )
 }
-
 export default DailyLog
