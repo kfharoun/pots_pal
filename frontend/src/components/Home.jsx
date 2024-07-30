@@ -1,11 +1,12 @@
 import { useEffect, useState, useRef } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import axios from 'axios'
-import { Row, Col, Form, Alert } from 'react-bootstrap'
+import { Row, Col, Form, Alert, Modal } from 'react-bootstrap'
 import SaltIntake from './imageComponents/SaltIntake'
 import WaterIntake from './imageComponents/WaterIntake'
 import MoodSelector from './imageComponents/MoodSelector'
 import Header from './Header'
+import { format } from 'date-fns'
 
 export default function Home() {
   const { username } = useParams()
@@ -26,6 +27,7 @@ export default function Home() {
   const [success, setSuccess] = useState(false)
   const formRef = useRef(null)
   const buttonRef = useRef(null)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [currentDate, setCurrentDate] = useState(new Date().toISOString().split('T')[0])
 
   useEffect(() => {
@@ -219,7 +221,8 @@ export default function Home() {
   }
 
   const handleDateChange = (newDate) => {
-    setCurrentDate(newDate)
+    const formattedDate = format(new Date(newDate), 'yyyy-MM-dd')
+    setCurrentDate(formattedDate)
   }
 
   const handleDailyLogClick = (e) => {
@@ -231,6 +234,23 @@ export default function Home() {
       navigate(`/log/${username}`)
     }, 700) 
   }
+
+  const handleDeleteDay = async () => {
+    try {
+      const response = await axios.delete(`http://localhost:8000/days/${username}/${currentDate}/`)
+      if (response.status === 204) {
+        console.log('day deleted!')
+        window.location.href = `/home/${username}`
+      }
+    } catch (error) {
+      console.error('error deleting day', error)
+    }
+  }
+
+  const toggleDeleteModal = () => {
+    setShowDeleteModal(!showDeleteModal)
+  }
+
 
   return (
     <>
@@ -263,17 +283,17 @@ export default function Home() {
             </Form.Group>
             <p className='disclaimer'>* based on recommended 126 ounces per day</p>
 
-            <h3 className='mt-4 mood-check'>Represents 1/4 teaspoon of salt</h3>
+            <h3 className='mt-4 mood-check'>represents 800mgs of sodium</h3>
 
             <Form.Group controlId='salt_intake' className='d-flex align-items-center'>
               <Form.Label className='mr-3'></Form.Label>
               <SaltIntake
                 saltIntake={formData.salt_intake}
-                onIncrement={() => handleIncrement('salt_intake', 1)}
-                onDecrement={() => handleDecrement('salt_intake', 1)}
+                onIncrement={() => handleIncrement('salt_intake', 800)}
+                onDecrement={() => handleDecrement('salt_intake', 800)}
               />
             </Form.Group>
-            <p className='disclaimer'>* based on recommended 2,300 mg of sodium per day</p>
+            <p className='disclaimer'>* based on recommended 4,800 mg of sodium per day</p>
 
             <Form.Group className='mt-4'>
               <button type='submit' className='submit-button' ref={buttonRef}>
@@ -293,7 +313,34 @@ export default function Home() {
             </Alert>
           )}
         </Col>
+        
       </Row>
+      <a className='startOver' onClick={toggleDeleteModal}>start the day over?</a>
+
+      <Modal
+        show={showDeleteModal}
+        onHide={toggleDeleteModal}
+        size="sm"
+        aria-labelledby="contained-modal-title-vcenter"
+        centered
+      >
+        <Modal.Header>
+          <Modal.Title id="contained-modal-title-vcenter">
+            are you sure?
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>this will permanently delete all of your data for your selected day!</p>
+        </Modal.Body>
+        <Modal.Footer>
+          <button variant="danger" onClick={handleDeleteDay}>
+            Delete
+          </button>
+          <button variant="secondary" onClick={toggleDeleteModal}>
+            Cancel
+          </button>
+        </Modal.Footer>
+      </Modal>
     </>
   )
 }

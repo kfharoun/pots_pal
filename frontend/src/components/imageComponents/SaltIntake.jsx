@@ -3,7 +3,7 @@ import React from 'react'
 const SaltIntake = ({ saltIntake, onIncrement, onDecrement }) => {
   const fullSaltImage = 'https://i.imgur.com/ZxaQX3K.png'
   const emptySaltImage = 'https://i.imgur.com/U6ZXpH6.png'
-  const saltUnits = saltIntake / 800
+  const saltUnits = Math.ceil(saltIntake / 800)
 
   const images = []
 
