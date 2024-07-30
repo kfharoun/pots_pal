@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useNavigate } from 'react-router-dom'
 import axios from 'axios'
-import { Row, Col, Form, Button, Alert } from 'react-bootstrap'
+import { Row, Col, Form, Alert } from 'react-bootstrap'
 import SaltIntake from './imageComponents/SaltIntake'
 import WaterIntake from './imageComponents/WaterIntake'
 import MoodSelector from './imageComponents/MoodSelector'
@@ -9,6 +9,7 @@ import Header from './Header'
 
 export default function Home() {
   const { username } = useParams()
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     good_day: false,
     neutral_day: false,
@@ -21,12 +22,10 @@ export default function Home() {
   const [selectedMood, setSelectedMood] = useState(null)
   const [existingEntry, setExistingEntry] = useState(null)
   const [existingData, setExistingData] = useState(null)
-  const [waterIntake, setWaterIntake] = useState(0)
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(false)
   const formRef = useRef(null)
   const buttonRef = useRef(null)
-  const dailyLogButtonRef = useRef(null)
   const [currentDate, setCurrentDate] = useState(new Date().toISOString().split('T')[0])
 
   useEffect(() => {
@@ -223,6 +222,16 @@ export default function Home() {
     setCurrentDate(newDate)
   }
 
+  const handleDailyLogClick = (e) => {
+    e.preventDefault()
+    if (buttonRef.current) {
+      buttonRef.current.classList.add('active')
+    }
+    setTimeout(() => {
+      navigate(`/log/${username}`)
+    }, 700) 
+  }
+
   return (
     <>
       <Header currentDate={currentDate} onDateChange={handleDateChange} />
@@ -232,8 +241,8 @@ export default function Home() {
           <h1 className='HomeWelcome'>✨ welcome back, {username} ✨</h1>
           <div className='button-container-1 daily-log'>
             <span className='mas'>Daily Log</span>
-            <Link to={`/log/${username}`}>
-              <button ref={buttonRef} className='w-100' id='daily-log-button'>
+            <Link to={`/log/${username}`} onClick={handleDailyLogClick} ref={buttonRef}>
+              <button className='w-100' id='daily-log-button'>
                 daily log
               </button>
             </Link>
@@ -254,33 +263,35 @@ export default function Home() {
             </Form.Group>
             <p className='disclaimer'>* based on recommended 126 ounces per day</p>
 
-            <h3 className='mt-4 mood-check'>Represents 800mgs of sodium</h3>
+            <h3 className='mt-4 mood-check'>Represents 1/4 teaspoon of salt</h3>
 
             <Form.Group controlId='salt_intake' className='d-flex align-items-center'>
               <Form.Label className='mr-3'></Form.Label>
               <SaltIntake
                 saltIntake={formData.salt_intake}
-                onIncrement={() => handleIncrement('salt_intake', 800)}
-                onDecrement={() => handleDecrement('salt_intake', 800)}
+                onIncrement={() => handleIncrement('salt_intake', 1)}
+                onDecrement={() => handleDecrement('salt_intake', 1)}
               />
             </Form.Group>
-            <p className='disclaimer'>* based on recommended 4800mgs</p>
-{/* 
-            {error && <Alert variant='danger' className='mt-3'>{error}</Alert>}
-            {success && <Alert variant='success' className='mt-3'>Data submitted successfully!</Alert>} */}
-            <div className=' update-button button-container-1'>
-              <span className='mas'>
-                {existingEntry ? 'update' : 'submit'}
-              </span>
-              <button
-                type='submit'
-                ref={buttonRef}
-                id='submit-button'
-              >
-                {existingEntry ? 'update' : 'submit'}
+            <p className='disclaimer'>* based on recommended 2,300 mg of sodium per day</p>
+
+            <Form.Group className='mt-4'>
+              <button type='submit' className='submit-button' ref={buttonRef}>
+                Submit
               </button>
-            </div>
+            </Form.Group>
           </Form>
+
+          {error && (
+            <Alert variant='danger' className='mt-4'>
+              {error}
+            </Alert>
+          )}
+          {success && (
+            <Alert variant='success' className='mt-4'>
+              Form submitted successfully!
+            </Alert>
+          )}
         </Col>
       </Row>
     </>
