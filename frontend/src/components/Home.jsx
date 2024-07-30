@@ -221,9 +221,9 @@ export default function Home() {
   }
 
   const handleDateChange = (newDate) => {
-    const formattedDate = format(new Date(newDate), 'yyyy-MM-dd')
-    setCurrentDate(formattedDate)
+    setCurrentDate(newDate)
   }
+
 
   const handleDailyLogClick = (e) => {
     e.preventDefault()
@@ -296,13 +296,22 @@ export default function Home() {
             <p className='disclaimer'>* based on recommended 4,800 mg of sodium per day</p>
 
             <Form.Group className='mt-4'>
-              <button type='submit' className='submit-button' ref={buttonRef}>
-                Submit
+            <div className=' update-button button-container-1'>
+              <span className='mas'>
+                {existingEntry ? 'Update' : 'Submit'}
+              </span>
+              <button
+                type='submit'
+                ref={buttonRef}
+                id='submit-button'
+              >
+                {existingEntry ? 'Update' : 'Submit'}
               </button>
+            </div>
             </Form.Group>
           </Form>
 
-          {error && (
+          {/* {error && (
             <Alert variant='danger' className='mt-4'>
               {error}
             </Alert>
@@ -311,7 +320,7 @@ export default function Home() {
             <Alert variant='success' className='mt-4'>
               Form submitted successfully!
             </Alert>
-          )}
+          )} */}
         </Col>
         
       </Row>
