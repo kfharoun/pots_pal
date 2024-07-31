@@ -278,6 +278,25 @@
 .everything{
   margin-top: -10px;
 }
+
+.modal-content {
+  background-color: #223863;
+  text-align: center;
+}
+
+.modal-dialog {
+  max-width: 60%;
+  margin: 0 auto;
+}
+
+.modal-body {
+  font-size: 14px;
+}
+
+
+
+
+
 /* daily log */
 
 .heartrate {

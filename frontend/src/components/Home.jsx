@@ -319,29 +319,30 @@ export default function Home() {
         <a className='delete-link' onClick={toggleDeleteModal}>start the day over?</a>
       </div>
       <Modal
-        show={showDeleteModal}
-        onHide={toggleDeleteModal}
-        size="sm"
-        aria-labelledby="contained-modal-title-vcenter"
-        centered
-      >
-        <Modal.Header>
-          <Modal.Title id="contained-modal-title-vcenter">
-            are you sure?
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>this will permanently delete all of your data for your selected day!</p>
-        </Modal.Body>
-        <Modal.Footer>
-          <button variant="danger" onClick={handleDeleteDay}>
-            Delete
-          </button>
-          <button variant="secondary" onClick={toggleDeleteModal}>
-            Cancel
-          </button>
-        </Modal.Footer>
-      </Modal>
+      show={showDeleteModal}
+      onHide={toggleDeleteModal}
+      size="sm"
+      aria-labelledby="contained-modal-title-vcenter"
+      centered
+      dialogClassName="custom-modal" // Apply the custom class
+    >
+      <Modal.Header>
+        <Modal.Title id="contained-modal-title-vcenter">
+          Are you sure?
+        </Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <p>This will permanently delete all of your data for your selected day!</p>
+      </Modal.Body>
+      <Modal.Footer>
+        <button className="btn btn-danger" onClick={handleDeleteDay}>
+          Delete
+        </button>
+        <button className="btn btn-secondary" onClick={toggleDeleteModal}>
+          Cancel
+        </button>
+      </Modal.Footer>
+    </Modal>
     </>
   )
 }
