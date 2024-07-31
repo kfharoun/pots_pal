@@ -97,6 +97,9 @@ const DailyLog = () => {
     </div>
   )
 
+  const handleDateChange = (newDate) => {
+    setCurrentDate(newDate)
+  }
 
   const renderForm = () => (
     <div className='logData'>
@@ -297,7 +300,7 @@ const DailyLog = () => {
 
   return (
     <>
-      <Header />
+      <Header onDateChange={handleDateChange} />
       <div className='container mt-4 DailyLog'>
         {/* {error && <Alert variant='danger' className='mt-3'>{error}</Alert>}
         {success && <Alert variant='success' className='mt-3'>Data submitted successfully!</Alert>} */}

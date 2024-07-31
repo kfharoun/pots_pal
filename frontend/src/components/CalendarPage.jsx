@@ -4,6 +4,7 @@ import Calendar from 'react-calendar'
 import axios from 'axios'
 import Header from './Header'
 import { useNavigate } from 'react-router-dom'
+import { format } from 'date-fns'
 // import 'react-calendar/dist/Calendar.css'
 
 const CalendarPage = () => {
@@ -119,66 +120,126 @@ const CalendarPage = () => {
     if (!data) return null
   
     return (
-      <div>
-        <h4>Log Data for {selectedDate.toISOString().split('T')[0]}</h4>
-        <p>High Heart Rate: {data.high_heart_rate}</p>
-        <p>Low Heart Rate: {data.low_heart_rate}</p>
-        <p>Weather: {data.weather}</p>
-        <div>
-          <p>Food Items:</p>
+      <div className='CalendarLogPage'>
+        <h4 className='logdatecal'>Your log for <span className='datecal'>{format(selectedDate, 'MMMM d')} </span></h4>
+        <div className='heartrate cal'>
+        <div className='high rate'>
+          <p>daily high</p> <p className='data heart cal'> {data.high_heart_rate}</p>
+        </div>
+
+        <div className='low rate'>
+          <p>daily low</p> <p className='data heart cal'> {data.low_heart_rate}</p>
+        </div>
+        </div>
+
+        <div className='weather rate cal'>
+          <p>average temp </p> <p className='data heart cal'>{data.weather}</p>
+        </div>
+
+        <div className='everything'>
+        <div className='foodActivity'>
+        <p className='ratetitle'> food & drink</p>
+        <div className='array-org cal'>
           {data.meal_item && data.meal_item.length > 0 ? data.meal_item.map((item, index) => (
-            <div key={index}>{item}</div>
+            <div key={index} className='this item'>{item}</div>
           )) : <p>No food items logged.</p>}
         </div>
+        </div>
         <div>
-          <p>Activity Items:</p>
+        <p className='ratetitle'>exercise & activity</p>
+        <div className='array-org cal'>
           {data.activity_item && data.activity_item.length > 0 ? data.activity_item.map((item, index) => (
-            <div key={index}>{item}</div>
+            <div key={index} className='this item'>{item}</div>
           )) : <p>No activity items logged.</p>}
         </div>
-        <button onClick={handleEditLog} variant="primary" className='mt-4'>Edit Log</button>
+        </div>
+        </div>
+        <button onClick={handleEditLog} variant="primary" className='mt-4 editbuttoncal'>Edit Log</button>
       </div>
     )
   }
 
   const renderAggregatedData = (data) => {
-    if (!data) return null
+    if (!data) return null;
+    
     return (
-      <div>
-        <h4>Meals:</h4>
-        <ul>
-          {Object.keys(data.meal_items).map((key) => (
-            <li key={key}>{key}</li>
-          ))}
-        </ul>
-        <h4>Activities:</h4>
-        <ul>
-          {Object.keys(data.activity_items).map((key) => (
-            <li key={key}>{key}</li>
-          ))}
-        </ul>
-        <h4>Water Intake:</h4>
-        <p>{data.water_intake}</p>
-        <h4>Salt Intake:</h4>
-        <p>{data.salt_intake}</p>
-        <h4>Weather:</h4>
-        <ul>
-          {Object.keys(data.weather).map((key) => (
-            <li key={key}>{key}: {data.weather[key]}</li>
-          ))}
-        </ul>
-        <h4>Low Heart Rate:</h4>
-        <ul>
-          {Object.keys(data.low_heart_rate).map((key) => (
-            <li key={key}>{key}: {data.low_heart_rate[key]}</li>
-          ))}
-        </ul>
-        <h4>High Heart Rate:</h4>
-        <ul>
-          {Object.keys(data.high_heart_rate).map((key) => (
-            <li key={key}>{key}: {data.high_heart_rate[key]}</li>
-          ))}
-        </ul>
+      <div className='CalendarAggregatedData'>
+        {data.meal_items && Object.keys(data.meal_items).length > 0 && (
+          <div className='foodActivity'>
+            <p className='ratetitle'>food & drink</p>
+            <div className='array-org cal'>
+              
+                {Object.keys(data.meal_items).map((key) => (
+                  <p key={key} className='this item'>{key}</p>
+                ))}
+              
+            </div>
+          </div>
+        )}
+  
+        {data.activity_items && Object.keys(data.activity_items).length > 0 && (
+          <div>
+            <p className='ratetitle'>Activities</p>
+            <div className='array-org cal'>
+                {Object.keys(data.activity_items).map((key) => (
+                  <p key={key} className='this item'>{key}</p>
+                ))}
+              
+            </div>
+          </div>
+        )}
+       <div className='high rate'>
+        {data.water_intake && (
+          <div className='weather rate cal'>
+            <p>Water Intake</p>
+            <p className='data heart cal'>{data.water_intake}</p>
+          </div>
+        )}
+  
+        {data.salt_intake && (
+          <div className='weather rate cal'>
+            <p>Salt Intake</p>
+            <p className='data heart cal'>{data.salt_intake}</p>
+          </div>
+          )}
+    </div>
+        {data.weather && Object.keys(data.weather).length > 0 && (
+          <div className='weather rate cal'>
+            <p>Weather</p>
+            <div className='array-org cal'>
+              
+                {Object.keys(data.weather).map((key) => (
+                  <p key={key} className='data heart cal'>{key}</p>
+                ))}
+              
+            </div>
+          </div>
+        )}
+  
+        {data.low_heart_rate && Object.keys(data.low_heart_rate).length != 0 && (
+          <div className='weather rate cal'>
+            <p>Low Heart Rate</p>
+            <div className='array-org cal'>
+                {Object.keys(data.low_heart_rate).map((key) => (
+                  <p key={key} className='this item'>{key}: {data.low_heart_rate[key]}</p>
+                ))}
+            
+            </div>
+          </div>
+        )}
+  
+        {data.high_heart_rate && Object.keys(data.high_heart_rate).length > 0 && (
+          <div className='weather rate cal'>
+            <p>High Heart Rate</p>
+            <div className='array-org cal'>
+      
+                {Object.keys(data.high_heart_rate).map((key) => (
+                  <p key={key} className='this item'>{key}</p>
+                ))}
+              
+            </div>
+          </div>
+        )}
       </div>
     )
   }
@@ -188,7 +249,8 @@ const CalendarPage = () => {
       <Header />
       <Calendar onClickDay={handleDateClick} tileContent={tileContent} />
       <div className="filter-buttons">
-        <button onClick={() => handleFilterClick('good_day')}>
+      
+        <div onClick={() => handleFilterClick('good_day')}>
           {selectedFilter === 'good_day' ? (
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-emoji-smile-fill" viewBox="0 0 16 16">
               <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16M7 6.5C7 7.328 6.552 8 6 8s-1-.672-1-1.5S5.448 5 6 5s1 .672 1 1.5M4.285 9.567a.5.5 0 0 1 .683.183A3.5 3.5 0 0 0 8 11.5a3.5 3.5 0 0 0 3.032-1.75.5.5 0 1 1 .866.5A4.5 4.5 0 0 1 8 12.5a4.5 4.5 0 0 1-3.898-2.25.5.5 0 0 1 .183-.683M10 8c-.552 0-1-.672-1-1.5S9.448 5 10 5s1 .672 1 1.5S10.552 8 10 8"/>             </svg>
@@ -196,40 +258,43 @@ const CalendarPage = () => {
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-emoji-smile" viewBox="0 0 16 16">
               <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
               <path d="M4.285 9.567a.5.5 0 0 1 .683.183A3.5 3.5 0 0 0 8 11.5a3.5 3.5 0 0 0 3.032-1.75.5.5 0 1 1 .866.5A4.5 4.5 0 0 1 8 12.5a4.5 4.5 0 0 1-3.898-2.25.5.5 0 0 1 .183-.683M7 6.5C7 7.328 6.552 8 6 8s-1-.672-1-1.5S5.448 5 6 5s1 .672 1 1.5m4 0c0 .828-.448 1.5-1 1.5s-1-.672-1-1.5S9.448 5 10 5s1 .672 1 1.5"/>
+              
             </svg>
+            
           )}
-        </button>
-        <button onClick={() => handleFilterClick('neutral_day')}>
+          
+        </div>
+        
+        <div onClick={() => handleFilterClick('neutral_day')}>
           {selectedFilter === 'neutral_day' ? (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-emoji-neutral-fill" viewBox="0 0 16 16">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#C09DE9" className="bi bi-emoji-neutral-fill" viewBox="0 0 16 16">
               <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16M7 6.5C7 7.328 6.552 8 6 8s-1-.672-1-1.5S5.448 5 6 5s1 .672 1 1.5m-3 4a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5M10 8c-.552 0-1-.672-1-1.5S9.448 5 10 5s1 .672 1 1.5S10.552 8 10 8"/>
             </svg>
           ) : (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-emoji-neutral" viewBox="0 0 16 16">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#C09DE9" className="bi bi-emoji-neutral" viewBox="0 0 16 16">
               <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
               <path d="M4 10.5a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 0-1h-7a.5.5 0 0 0-.5.5m3-4C7 5.672 6.552 5 6 5s-1 .672-1 1.5S5.448 8 6 8s1-.672 1-1.5m4 0c0-.828-.448-1.5-1-1.5s-1 .672-1 1.5S9.448 8 10 8s1-.672 1-1.5"/>
             </svg>
           )}
-        </button>
-        <button onClick={() => handleFilterClick('bad_day')}>
+        </div>
+        <div onClick={() => handleFilterClick('bad_day')}>
           {selectedFilter === 'bad_day' ? (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-emoji-frown-fill" viewBox="0 0 16 16">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#FF4D87" className="bi bi-emoji-frown-fill" viewBox="0 0 16 16">
               <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16M7 6.5C7 7.328 6.552 8 6 8s-1-.672-1-1.5S5.448 5 6 5s1 .672 1 1.5m-2.715 5.933a.5.5 0 0 1-.183-.683A4.5 4.5 0 0 1 8 9.5a4.5 4.5 0 0 1 3.898 2.25.5.5 0 0 1-.866.5A3.5 3.5 0 0 0 8 10.5a3.5 3.5 0 0 0-3.032 1.75.5.5 0 0 1-.683.183M10 8c-.552 0-1-.672-1-1.5S9.448 5 10 5s1 .672 1 1.5S10.552 8 10 8"/>
             </svg>
           ) : (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-emoji-frown" viewBox="0 0 16 16">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#FF4D87" className="bi bi-emoji-frown" viewBox="0 0 16 16">
               <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
               <path d="M4.285 12.433a.5.5 0 0 0 .683-.183A3.5 3.5 0 0 1 8 10.5c1.295 0 2.426.703 3.032 1.75a.5.5 0 0 0 .866-.5A4.5 4.5 0 0 0 8 9.5a4.5 4.5 0 0 0-3.898 2.25.5.5 0 0 0 .183.683M7 6.5C7 7.328 6.552 8 6 8s-1-.672-1-1.5S5.448 5 6 5s1 .672 1 1.5m4 0c0 .828-.448 1.5-1 1.5s-1-.672-1-1.5S9.448 5 10 5s1 .672 1 1.5S10.552 8 10 8"/>
             </svg>
           )}
-        </button>
+        </div>
       </div>
       {selectedFilter && aggregatedData ? (
         <div>
-          <h3>Similarities on {selectedFilter.replace('_', ' ')}:</h3>
-          <h4>Today:</h4>
+          <h3  className='logdatecal'>Similarities on {selectedFilter.replace('_', ' ')}</h3>
           {renderAggregatedData(aggregatedData.current_day)}
-          <h4>Yesterday:</h4>
+          <h4  className='logdatecal'>average day before</h4>
           {renderAggregatedData(aggregatedData.day_before)}
         </div>
       ) : (
