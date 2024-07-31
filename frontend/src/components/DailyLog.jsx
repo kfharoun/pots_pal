@@ -11,7 +11,7 @@ const DailyLog = () => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const dateParam = queryParams.get('date') || new Date().toISOString().split('T')[0]
-  const [currentDate, setCurrentDate] = useState(dateParam)
+  const [currentDate, setCurrentDate] = useState(null)
   const [logData, setLogData] = useState({
     high_heart_rate: '',
     low_heart_rate: '',

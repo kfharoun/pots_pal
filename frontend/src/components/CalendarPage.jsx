@@ -6,6 +6,7 @@ import Header from './Header'
 import { useNavigate } from 'react-router-dom'
 import { format } from 'date-fns'
 // import 'react-calendar/dist/Calendar.css'
+const toEST = (date) => new Date(date.getTime() - (5 * 60 * 60 * 1000))
 
 const CalendarPage = () => {
   const navigate = useNavigate()
@@ -19,7 +20,7 @@ const CalendarPage = () => {
 
   useEffect(() => {
     const getStartData = async () => {
-      const today = new Date().toISOString().split('T')[0]
+      const today = toEST(new Date()).toISOString().split('T')[0];
       try {
         const [logResponse, dayResponse] = await Promise.all([
           axios.get(`http://localhost:8000/data/${username}/date/${today}/`),
@@ -44,7 +45,7 @@ const CalendarPage = () => {
         console.error('Error getting initial data:', error)
       }
     }
-
+  
     getStartData()
   }, [username])
 
@@ -215,31 +216,24 @@ const CalendarPage = () => {
             </div>
           </div>
         )}
-  
-        {data.low_heart_rate && Object.keys(data.low_heart_rate).length != 0 && (
-          <div className='weather rate cal'>
-            <p>Low Heart Rate</p>
-            <div className='array-org cal'>
-                {Object.keys(data.low_heart_rate).map((key) => (
-                  <p key={key} className='this item'>{key}: {data.low_heart_rate[key]}</p>
-                ))}
-            
-            </div>
+        {data.low_heart_rate !== undefined && data.low_heart_rate !== null && (
+        <div className='weather rate cal'>
+          <p>Low Heart Rate</p>
+          <div className='array-org cal'>
+            <p className='this item'>{data.low_heart_rate}</p>
           </div>
-        )}
-  
-        {data.high_heart_rate && Object.keys(data.high_heart_rate).length > 0 && (
-          <div className='weather rate cal'>
-            <p>High Heart Rate</p>
-            <div className='array-org cal'>
-      
-                {Object.keys(data.high_heart_rate).map((key) => (
-                  <p key={key} className='this item'>{key}</p>
-                ))}
-              
-            </div>
+        </div>
+      )}
+
+      {data.high_heart_rate !== undefined && data.high_heart_rate !== null && (
+        <div className='weather rate cal'>
+          <p>High Heart Rate</p>
+          <div className='array-org cal'>
+            <p className='this item'>{data.high_heart_rate}</p>
           </div>
-        )}
+        </div>
+      )}
+       
       </div>
     )
   }

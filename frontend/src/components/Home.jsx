@@ -6,7 +6,6 @@ import SaltIntake from './imageComponents/SaltIntake'
 import WaterIntake from './imageComponents/WaterIntake'
 import MoodSelector from './imageComponents/MoodSelector'
 import Header from './Header'
-import { format } from 'date-fns'
 
 export default function Home() {
   const { username } = useParams()
@@ -28,36 +27,52 @@ export default function Home() {
   const formRef = useRef(null)
   const buttonRef = useRef(null)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const [currentDate, setCurrentDate] = useState(new Date().toISOString().split('T')[0])
+  const [currentDate, setCurrentDate] = useState(null)
 
   useEffect(() => {
-    const getExisting = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:8000/days/${username}/${currentDate}/`
-        )
-        if (response.status === 200) {
-          const entry = response.data
-          setExistingEntry(entry)
-          if (entry.data.length > 0) {
-            const data = entry.data[0]
-            setExistingData(data)
-            setFormData({
-              good_day: entry.good_day,
-              neutral_day: entry.neutral_day,
-              nauseous: entry.nauseous,
-              fainting: entry.fainting,
-              bed_bound: entry.bed_bound,
-              salt_intake: data.salt_intake,
-              water_intake: data.water_intake,
-            })
-            if (entry.good_day) setSelectedMood('good_day')
-            if (entry.neutral_day) setSelectedMood('neutral_day')
-            if (entry.nauseous) setSelectedMood('nauseous')
-            if (entry.fainting) setSelectedMood('fainting')
-            if (entry.bed_bound) setSelectedMood('bed_bound')
-          } else {
-            // No existing data for the day
+    if (currentDate) {
+      const getExisting = async () => {
+        try {
+          const response = await axios.get(
+            `http://localhost:8000/days/${username}/${currentDate}/`
+          )
+          if (response.status === 200) {
+            const entry = response.data
+            setExistingEntry(entry)
+            if (entry.data.length > 0) {
+              const data = entry.data[0]
+              setExistingData(data)
+              setFormData({
+                good_day: entry.good_day,
+                neutral_day: entry.neutral_day,
+                nauseous: entry.nauseous,
+                fainting: entry.fainting,
+                bed_bound: entry.bed_bound,
+                salt_intake: data.salt_intake,
+                water_intake: data.water_intake,
+              })
+              if (entry.good_day) setSelectedMood('good_day')
+              if (entry.neutral_day) setSelectedMood('neutral_day')
+              if (entry.nauseous) setSelectedMood('nauseous')
+              if (entry.fainting) setSelectedMood('fainting')
+              if (entry.bed_bound) setSelectedMood('bed_bound')
+            } else {
+              setExistingData(null)
+              setFormData({
+                good_day: false,
+                neutral_day: false,
+                nauseous: false,
+                fainting: false,
+                bed_bound: false,
+                salt_intake: 0,
+                water_intake: 0,
+              })
+              setSelectedMood(null)
+            }
+          }
+        } catch (error) {
+          if (error.response && error.response.status === 404) {
+            setExistingEntry(null)
             setExistingData(null)
             setFormData({
               good_day: false,
@@ -69,28 +84,13 @@ export default function Home() {
               water_intake: 0,
             })
             setSelectedMood(null)
+          } else {
+            console.error('Error getting existing entry:', error)
           }
         }
-      } catch (error) {
-        if (error.response && error.response.status === 404) {
-          setExistingEntry(null)
-          setExistingData(null)
-          setFormData({
-            good_day: false,
-            neutral_day: false,
-            nauseous: false,
-            fainting: false,
-            bed_bound: false,
-            salt_intake: 0,
-            water_intake: 0,
-          })
-          setSelectedMood(null)
-        } else {
-          console.error('Error getting existing entry:', error)
-        }
       }
+      getExisting()
     }
-    getExisting()
   }, [username, currentDate])
 
   const handleChange = (e) => {
@@ -145,13 +145,10 @@ export default function Home() {
       const dataData = {
         water_intake: formData.water_intake,
         salt_intake: formData.salt_intake,
-        // meal_item: [],
-        // activity_item: []
       }
 
       try {
         if (existingEntry) {
-          // Update existing day without sending the date
           await axios.patch(
             `http://localhost:8000/days/${username}/${existingEntry.id}/`,
             dayData,
@@ -162,9 +159,7 @@ export default function Home() {
             }
           )
 
-          // Check if there is existing data for the day
           if (existingData) {
-            // Update existing data with PATCH
             await axios.patch(
               `http://localhost:8000/data/${existingData.id}/`,
               dataData,
@@ -175,7 +170,6 @@ export default function Home() {
               }
             )
           } else {
-            // Create new data entry
             await axios.post(
               `http://localhost:8000/data/`,
               { ...dataData, day: existingEntry.id },
@@ -187,7 +181,6 @@ export default function Home() {
             )
           }
         } else {
-          // Create new day entry including the date
           const dayResponse = await axios.post(
             `http://localhost:8000/days/`,
             { ...dayData, date: currentDate },
@@ -198,7 +191,6 @@ export default function Home() {
             }
           )
           const dayId = dayResponse.data.id
-          // Create new data entry
           await axios.post(
             `http://localhost:8000/data/`,
             { ...dataData, day: dayId },
@@ -217,13 +209,12 @@ export default function Home() {
         setError(err.response ? err.response.data : 'Error submitting data')
         setSuccess(false)
       }
-    }, 700) // Delay to match animation duration
+    }, 700)
   }
 
   const handleDateChange = (newDate) => {
     setCurrentDate(newDate)
   }
-
 
   const handleDailyLogClick = (e) => {
     e.preventDefault()
@@ -232,7 +223,7 @@ export default function Home() {
     }
     setTimeout(() => {
       navigate(`/log/${username}`)
-    }, 700) 
+    }, 700)
   }
 
   const handleDeleteDay = async () => {
