@@ -216,11 +216,12 @@ const CalendarPage = () => {
             </div>
           </div>
         )}
+        <div className='high rate'>
         {data.low_heart_rate !== undefined && data.low_heart_rate !== null && (
         <div className='weather rate cal'>
           <p>Low Heart Rate</p>
           <div className='array-org cal'>
-            <p className='this item'>{data.low_heart_rate}</p>
+            <p className='data heart cal'>{data.low_heart_rate}</p>
           </div>
         </div>
       )}
@@ -229,11 +230,11 @@ const CalendarPage = () => {
         <div className='weather rate cal'>
           <p>High Heart Rate</p>
           <div className='array-org cal'>
-            <p className='this item'>{data.high_heart_rate}</p>
+            <p className='data heart cal'>{data.high_heart_rate}</p>
           </div>
         </div>
       )}
-       
+       </div>
       </div>
     )
   }
